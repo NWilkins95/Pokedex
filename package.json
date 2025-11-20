@@ -4,7 +4,7 @@
   "description": "Gen 1 Pokemon Pokedex with MongoDB",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node server.js",
     "seed": "node src/seed.js",
     "dev": "nodemon src/index.js"
   },
