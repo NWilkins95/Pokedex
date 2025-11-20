@@ -5,7 +5,7 @@ const swaggerAutogen = require('swagger-autogen')();
 const doc = {
   info: {
     title: "Pokedex",
-    description: '',
+    description: 'An API to manage a Pokedex for the first generation of Pokemon.',
   },
   host: process.env.RENDER_EXTERNAL_URL,
   schemes: ['https']
