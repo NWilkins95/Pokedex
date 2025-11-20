@@ -5,12 +5,23 @@
     "description": "An API to manage a Pokedex for the first generation of Pokemon.",
     "version": "1.0.0"
   },
+  "host": "",
   "basePath": "/",
   "schemes": [
     "https"
   ],
   "paths": {
-    "/pokemon/{pokemonId}/moves": {
+    "/api-docs": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/moves/pokemon/{pokemonId}/moves": {
       "get": {
         "description": "",
         "parameters": [
@@ -41,7 +52,7 @@
         }
       }
     },
-    "/battle-team/{teamId}/pokemon/{pokemonIndex}/moves": {
+    "/moves/battle-team/{teamId}/pokemon/{pokemonIndex}/moves": {
       "post": {
         "description": "",
         "parameters": [

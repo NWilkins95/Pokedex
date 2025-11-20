@@ -25,5 +25,7 @@ process.on('uncaughtException', (err, origin) => {
   console.error(`Caught exception: ${err}\nException origin: ${origin}`);
 });
 
-// Initialize the database connection and start the server
-startServer(app, port);
+// Start the server
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
