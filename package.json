@@ -8,15 +8,22 @@
     "seed": "node src/seed.js",
     "dev": "nodemon src/index.js"
   },
-  "keywords": ["pokemon", "pokedex", "gen1", "mongodb"],
+  "keywords": [
+    "pokemon",
+    "pokedex",
+    "gen1",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.3",
-    "dotenv": "^16.3.1"
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.1.11",
+    "swagger-autogen": "^2.23.7"
   }
 }
