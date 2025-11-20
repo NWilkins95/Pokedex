@@ -1,0 +1,22 @@
+{
+  "name": "gen1-pokedex",
+  "version": "1.0.0",
+  "description": "Gen 1 Pokemon Pokedex with MongoDB",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "seed": "node src/seed.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["pokemon", "pokedex", "gen1", "mongodb"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.3",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
