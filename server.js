@@ -26,6 +26,4 @@ process.on('uncaughtException', (err, origin) => {
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-});
+startServer(app, port);
