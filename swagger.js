@@ -1,0 +1,17 @@
+require('dotenv').config();
+
+const swaggerAutogen = require('swagger-autogen')();
+
+const doc = {
+  info: {
+    title: "Pokedex",
+    description: 'An API to manage a Pokedex for the first generation of Pokemon.',
+  },
+  host: process.env.RENDER_EXTERNAL_URL,
+  schemes: ['https']
+};
+
+const outputFile = './swagger.json';
+const routes = ['./src/routes/index.js'];
+
+swaggerAutogen(outputFile, routes, doc);
