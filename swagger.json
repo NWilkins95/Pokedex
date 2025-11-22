@@ -7,224 +7,195 @@
   },
   "host": "localhost:3000",
   "basePath": "/",
-  "schemes": [
-    "https",
-    "http"
+  "tags": [
+    {
+      "name": "Pokemon",
+      "description": "Endpoints related to Pokémon data"
+    },
+    {
+      "name": "Moves",
+      "description": "Endpoints related to Pokémon moves"
+    },
+    {
+      "name": "Battle Teams",
+      "description": "Endpoints for managing battle teams"
+    },
+    {
+      "name": "Users",
+      "description": "Endpoints for user accounts and authentication"
+    }
   ],
+  "schemes": ["https", "http"],
   "paths": {
     "/api-docs": {
       "get": {
-        "description": "",
+        "tags": ["Default"],
+        "description": "API documentation route",
         "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/moves/": {
-      "get": {
-        "description": "",
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/users/{username}": {
-      "get": {
-        "description": "",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/users/": {
-      "post": {
-        "description": "",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "default": { "description": "" }
         }
       }
     },
     "/pokemons/": {
       "get": {
-        "description": "",
+        "tags": ["Pokemon"],
+        "description": "Get all Pokémon",
+        "produces": ["application/json"],
         "responses": {
-          "default": {
-            "description": ""
-          }
+          "200": { "description": "OK" },
+          "500": { "description": "Internal Server Error" }
         }
       }
     },
     "/pokemons/{id}": {
       "get": {
-        "description": "",
+        "tags": ["Pokemon"],
+        "description": "Get a Pokémon by ID",
+        "produces": ["application/json"],
         "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/moves/pokemon/{pokemonId}/moves": {
+      "get": {
+        "tags": ["Moves"],
+        "description": "Get moves for a specific Pokémon",
+        "parameters": [
+          { "name": "pokemonId", "in": "path", "required": true, "type": "string" },
+          { "name": "level", "in": "query", "type": "string" },
+          { "name": "groupBy", "in": "query", "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/moves/battle-team/{teamId}/pokemon/{pokemonIndex}/moves": {
+      "post": {
+        "tags": ["Moves"],
+        "description": "Add moves to a Pokémon in a battle team",
+        "parameters": [
+          { "name": "teamId", "in": "path", "required": true, "type": "string" },
+          { "name": "pokemonIndex", "in": "path", "required": true, "type": "string" },
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": { "moveIds": { "example": "any" } }
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
-          }
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
         }
       }
     },
     "/battle_teams/{id}": {
       "get": {
-        "description": "",
-        "produces": [
-          "application/json"
-        ],
+        "tags": ["Battle Teams"],
+        "description": "Get a battle team by ID",
+        "produces": ["application/json"],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
         }
       },
       "put": {
-        "description": "",
+        "tags": ["Battle Teams"],
+        "description": "Update a battle team",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
         }
       },
       "delete": {
-        "description": "",
+        "tags": ["Battle Teams"],
+        "description": "Delete a battle team",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
         }
       }
     },
     "/battle_teams/": {
       "post": {
-        "description": "",
+        "tags": ["Battle Teams"],
+        "description": "Create a new battle team",
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "201": { "description": "Created" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/users/{username}": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get a user by username",
+        "produces": ["application/json"],
+        "parameters": [
+          { "name": "username", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "description": "Update a user",
+        "parameters": [
+          { "name": "username", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "description": "Delete a user",
+        "parameters": [
+          { "name": "username", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/users/": {
+      "post": {
+        "tags": ["Users"],
+        "description": "Create a new user",
+        "responses": {
+          "201": { "description": "Created" },
+          "500": { "description": "Internal Server Error" }
         }
       }
     }
