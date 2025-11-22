@@ -5,7 +5,7 @@ const pokemonsController = {};
 // Get all pokemons
 pokemonsController.getAllPokemons = async (req, res) => {
   try {
-    const pokemons = await mongodb.getDb().db().collection('pokemons').find().toArray();
+    const pokemons = await mongodb.getDb().collection('pokemons').find().toArray();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(pokemons);
   } catch (err) {
@@ -18,7 +18,7 @@ pokemonsController.getAllPokemons = async (req, res) => {
 pokemonsController.getPokemonById = async (req, res) => {
   try {
     const pokemonId = new ObjectId(req.params.id);
-    const pokemon = await mongodb.getDb().db().collection('pokemons').findOne({ _id: pokemonId });
+    const pokemon = await mongodb.getDb().collection('pokemons').findOne({ _id: pokemonId });
     if (pokemon) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(pokemon);

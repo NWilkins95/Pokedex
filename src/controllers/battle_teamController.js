@@ -6,7 +6,7 @@ const battle_teamController = {};
 battle_teamController.getBattleTeamById = async (req, res) => {
   try {
     const teamId = new ObjectId(req.params.id);
-    const team = await mongodb.getDb().db().collection('battle_teams').findOne({ _id: teamId });
+    const team = await mongodb.getDb().collection('battle_teams').findOne({ _id: teamId });
     if (team) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(team);
@@ -23,7 +23,7 @@ battle_teamController.getBattleTeamById = async (req, res) => {
 battle_teamController.createBattleTeam = async (req, res) => {
   try {
     const newTeam = req.body;
-    const result = await mongodb.getDb().db().collection('battle_teams').insertOne(newTeam); 
+    const result = await mongodb.getDb().collection('battle_teams').insertOne(newTeam); 
     res.status(201).json(result.ops[0]);
   } catch (err) {
     console.error("Error creating battle team:", err);
@@ -36,7 +36,7 @@ battle_teamController.updateBattleTeamById = async (req, res) => {
   try {
     const teamId = new ObjectId(req.params.id);
     const updatedTeam = req.body;
-    const result = await mongodb.getDb().db().collection('battle_teams').updateOne(
+    const result = await mongodb.getDb().collection('battle_teams').updateOne(
       { _id: teamId },
       { $set: updatedTeam }
     );
@@ -55,7 +55,7 @@ battle_teamController.updateBattleTeamById = async (req, res) => {
 battle_teamController.deleteBattleTeamById = async (req, res) => {
   try {
     const teamId = new ObjectId(req.params.id);
-    const result = await mongodb.getDb().db().collection('battle_teams').deleteOne({ _id: teamId });
+    const result = await mongodb.getDb().collection('battle_teams').deleteOne({ _id: teamId });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "Battle team deleted successfully." });
     } else {

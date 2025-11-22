@@ -6,7 +6,7 @@ const userController = {};
 userController.getUserByUsername = async (req, res) => {
   try {
     const username = req.params.username;
-    const user = await mongodb.getDb().db().collection('users').findOne({ username: username });
+    const user = await mongodb.getDb().collection('users').findOne({ username: username });
     if (user) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(user);
@@ -23,7 +23,7 @@ userController.getUserByUsername = async (req, res) => {
 userController.createUser = async (req, res) => {
   try {
     const newUser = req.body;
-    const result = await mongodb.getDb().db().collection('users').insertOne(newUser); 
+    const result = await mongodb.getDb().collection('users').insertOne(newUser); 
     res.status(201).json(result.ops[0]);
   } catch (err) {
     console.error("Error creating user:", err);
@@ -32,12 +32,31 @@ userController.createUser = async (req, res) => {
 };
 
 // NEED TO ADD UPDATE FUNCTIONALITY
+// Update a user by username
+userController.updateUserByUsername = async (req, res) => {
+  try {
+    const username = req.params.username;
+    const updatedUser = req.body;
+    const result = await mongodb.getDb().collection('users').updateOne(
+      { username: username },
+      { $set: updatedUser }
+    );
+    if (result.matchedCount > 0) {
+      res.status(200).json({ message: "User updated successfully." });
+    } else {
+      res.status(404).json({ error: "User not found." });
+    }
+  } catch (err) {
+    console.error("Error updating user by username:", err);
+    res.status(500).json({ error: "An error occurred while updating the user." });
+  }
+};
 
 // Delete a user by username
 userController.deleteUserByUsername = async (req, res) => {
   try {
     const username = req.params.username;
-    const result = await mongodb.getDb().db().collection('users').deleteOne({ username: username });
+    const result = await mongodb.getDb().collection('users').deleteOne({ username: username });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "User deleted successfully." });
     } else {

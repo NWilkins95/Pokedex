@@ -4,3 +4,5 @@ const movesController = require('../controllers/movesController');
 
 // Route to get all moves
 router.get('/', movesController.getAllMoves);
+
+module.exports = router;
