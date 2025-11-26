@@ -19,8 +19,11 @@
   "dependencies": {
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "express-session": "^1.18.2",
     "mongodb": "^6.21.0",
     "mongoose": "^8.20.0",
+    "passport": "^0.7.0",
+    "passport-github": "^1.1.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
