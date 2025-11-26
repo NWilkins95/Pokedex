@@ -1,6 +1,8 @@
 // Import necessary modules and initialize the Express application
 require('dotenv').config();
 const express = require('express');
+const { errorHandler } = require('./src/utils/error');
+const { handleErrors } = require('./src/utils/error');
 const mongodb = require('./src/db/connect');
 const { startServer } = require('./src/utils/index');
 const port = process.env.PORT || 3000;
@@ -19,6 +21,9 @@ app.use((req, res, next) => {
 
 // Use routes defined in the routes directory
 app.use('/', require('./src/routes'));
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Global error handling for uncaught exceptions
 process.on('uncaughtException', (err, origin) => {
