@@ -5,7 +5,7 @@
     "description": "An API to manage a Pokedex for the first generation of Pokemon.",
     "version": "1.0.0"
   },
-  "host": "pokedex-g9kr.onrender.com",
+  "host": "localhost:3000",
   "basePath": "/",
   "tags": [
     {
@@ -25,7 +25,7 @@
       "description": "Endpoints for user accounts and authentication"
     }
   ],
-  "schemes": ["https"],
+  "schemes": ["https", "http"],
   "paths": {
     "/api-docs": {
       "get": {
