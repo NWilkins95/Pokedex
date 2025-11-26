@@ -5,7 +5,7 @@ const { handleErrors } = require('../utils/error');
 const { checkLogin } = require('../utils/index');
 
 // Route to get a battle team by ID
-router.get('/:id', handleErrors(battle_teamController.getBattleTeamById));
+router.get('/:id', checkLogin, handleErrors(battle_teamController.getBattleTeamById));
 
 // Route to create a new battle team
 router.post('/', checkLogin, handleErrors(battle_teamController.createBattleTeam));
