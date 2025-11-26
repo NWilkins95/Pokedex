@@ -2,64 +2,34 @@
   "swagger": "2.0",
   "info": {
     "title": "Pokedex",
-    "description": "An API to manage a Pokedex for the first generation of Pokemon.",
+    "description": "An API to manage a Pokedex for the first generation of Pokemon. \n\n**Authentication Notice:**\n\nAll `POST`, `PUT`, and `DELETE` routes require authorization (indicated by the lock icon), in addition to the `GET` route to retrive a specific battle team. If you are not authenticated, you must manually copy and paste `https://pokedex-g9kr.onrender.com/login` into your browser address bar to sign in via GitHub, after which you will be redirected back to the API documentation. Failure to do so will result in the API returning a `401 Unauthorized` as a response.\n\nTo end your session, please copy and paste `https://pokedex-g9kr.onrender.com/auth/logout` into your browser's address bar.\n\nAll routes are wrapped in centralized error handling. POST and PUT routes include validation logic and may return `422 Unprocessable Entity` if input is invalid.\n\n_Not affiliated with Nintendo._",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "pokedex-g9kr.onrender.com",
   "basePath": "/",
   "tags": [
-    {
-      "name": "Pokemon",
-      "description": "Endpoints related to Pokémon data"
-    },
-    {
-      "name": "Moves",
-      "description": "Endpoints related to Pokémon moves"
-    },
-    {
-      "name": "Battle Teams",
-      "description": "Endpoints for managing battle teams"
-    },
-    {
-      "name": "Users",
-      "description": "Endpoints for user accounts and authentication"
-    }
+    { "name": "Pokemon", "description": "Endpoints related to Pokémon data" },
+    { "name": "Moves", "description": "Endpoints related to Pokémon moves" },
+    { "name": "Battle Teams", "description": "Endpoints for managing battle teams" },
+    { "name": "Users", "description": "Endpoints for user accounts and authentication" }
   ],
-  "schemes": ["https", "http"],
+  "schemes": ["https"],
   "paths": {
-    "/api-docs": {
-      "get": {
-        "tags": ["Default"],
-        "description": "API documentation route",
-        "responses": {
-          "default": { "description": "" }
-        }
-      }
-    },
     "/pokemons/": {
       "get": {
         "tags": ["Pokemon"],
         "description": "Get all Pokémon",
-        "produces": ["application/json"],
-        "responses": {
-          "200": { "description": "OK" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "500": { "description": "Internal Server Error" } }
       }
     },
     "/pokemons/{id}": {
       "get": {
         "tags": ["Pokemon"],
         "description": "Get a Pokémon by ID",
-        "produces": ["application/json"],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "500": { "description": "Internal Server Error" } }
       }
     },
     "/moves/pokemon/{pokemonId}/moves": {
@@ -105,98 +75,101 @@
       "get": {
         "tags": ["Battle Teams"],
         "description": "Get a battle team by ID",
-        "produces": ["application/json"],
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       },
       "put": {
         "tags": ["Battle Teams"],
         "description": "Update a battle team",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       },
       "delete": {
         "tags": ["Battle Teams"],
         "description": "Delete a battle team",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       }
     },
     "/battle_teams/": {
       "post": {
         "tags": ["Battle Teams"],
         "description": "Create a new battle team",
-        "responses": {
-          "201": { "description": "Created" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       }
     },
     "/users/{username}": {
       "get": {
         "tags": ["Users"],
         "description": "Get a user by username",
-        "produces": ["application/json"],
         "parameters": [
           { "name": "username", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "500": { "description": "Internal Server Error" } }
       },
       "put": {
         "tags": ["Users"],
         "description": "Update a user",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
         "parameters": [
           { "name": "username", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       },
       "delete": {
         "tags": ["Users"],
         "description": "Delete a user",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
         "parameters": [
           { "name": "username", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       }
     },
     "/users/": {
       "post": {
         "tags": ["Users"],
         "description": "Create a new user",
-        "responses": {
-          "201": { "description": "Created" },
-          "500": { "description": "Internal Server Error" }
-        }
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
       }
     }
   }
