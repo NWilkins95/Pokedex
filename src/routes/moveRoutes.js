@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { getLearnableMoves, validateMoves, getMovesGroupedByMethod } = require('../utils/moveValidator');
 const BattleTeam = require('../models/BattleTeam');
+const { handleErrors } = require('../utils/error');
 
 /**
  * GET /api/pokemon/:pokemonId/moves
  * Get all moves a Pokemon can learn at a specific level
  */
-router.get('/pokemon/:pokemonId/moves', async (req, res) => {
+router.get('/pokemon/:pokemonId/moves', handleErrors(async (req, res) => {
   try {
     const { pokemonId } = req.params;
     const { level = 100, groupBy } = req.query;
@@ -49,13 +50,13 @@ router.get('/pokemon/:pokemonId/moves', async (req, res) => {
       error: error.message
     });
   }
-});
+}));
 
 /**
  * POST /api/battle-team/:teamId/pokemon/:pokemonIndex/moves
  * Set moves for a Pokemon in a battle team with validation
  */
-router.post('/battle-team/:teamId/pokemon/:pokemonIndex/moves', async (req, res) => {
+router.post('/battle-team/:teamId/pokemon/:pokemonIndex/moves', handleErrors(async (req, res) => {
   try {
     const { teamId, pokemonIndex } = req.params;
     const { moveIds } = req.body;
@@ -118,6 +119,6 @@ router.post('/battle-team/:teamId/pokemon/:pokemonIndex/moves', async (req, res)
       error: error.message
     });
   }
-});
+}));
 
 module.exports = router;
