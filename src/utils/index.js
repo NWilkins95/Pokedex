@@ -13,4 +13,11 @@ async function startServer(app, port) {
   }
 }
 
-module.exports = { startServer };
+function checkLogin(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: 'Unauthorized' }); 
+}
+
+module.exports = { startServer, checkLogin };
