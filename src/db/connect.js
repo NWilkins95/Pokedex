@@ -1,20 +1,26 @@
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
 
-let client;
+let connected = false;
 
 async function connectToDb() {
-  if (client) {
+  if (connected && mongoose.connection.readyState === 1) {
     console.log('DB already initialized!');
-    return client.db("Pokedex"); 
+    return mongoose.connection.db;
   }
 
   try {
-    client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
-    console.log('Connected to MongoDB Atlas');
-    return client.db("Pokedex");
+    await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: 'Pokedex',
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    connected = true;
+    mongoose.connection.on('error', (err) => console.error('MongoDB connection error:', err));
+    console.log('Connected to MongoDB via mongoose');
+    return mongoose.connection.db;
   } catch (err) {
     console.error('MongoDB connection failed:', err);
     throw err;
@@ -22,10 +28,10 @@ async function connectToDb() {
 }
 
 function getDb() {
-  if (!client) {
+  if (!mongoose.connection || mongoose.connection.readyState !== 1) {
     throw Error('Database not initialized.');
   }
-  return client.db("Pokedex");
+  return mongoose.connection.db;
 }
 
-module.exports = { connectToDb, getDb };
+module.exports = { connectToDb, getDb, mongoose };
