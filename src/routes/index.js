@@ -4,7 +4,6 @@ routes.use('/', require('./swagger'));
 routes.use('/pokemons', require('./pokemons'));
 routes.use('/moves', require('./moveRoutes'));
 routes.use('/battle_teams', require('./battle_team'));
-routes.use('/users', require('./user'));
 routes.use('/auth', require('./auth'));
 routes.use('/custom_pokemons', require('./customPokemon'));
 routes.use('/battle_history', require('./battleHistory'));
