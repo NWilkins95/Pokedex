@@ -1,12 +1,12 @@
-const mongodb = require('../db/connect');
-const ObjectId = require('mongodb').ObjectId;
+const User = require('../models/User');
+const mongoose = require('mongoose');
 const userController = {};
 
 // Get a user by username
 userController.getUserByUsername = async (req, res) => {
   try {
     const username = req.params.username;
-    const user = await mongodb.getDb().collection('users').findOne({ username: username });
+    const user = await User.findOne({ username }).lean();
     if (user) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(user);
@@ -23,8 +23,8 @@ userController.getUserByUsername = async (req, res) => {
 userController.createUser = async (req, res) => {
   try {
     const newUser = req.body;
-    const result = await mongodb.getDb().collection('users').insertOne(newUser); 
-    res.status(201).json(result.ops[0]);
+    const created = await User.create(newUser);
+    res.status(201).json(created);
   } catch (err) {
     console.error("Error creating user:", err);
     res.status(500).json({ error: "An error occurred while creating the user." });
@@ -37,10 +37,7 @@ userController.updateUserByUsername = async (req, res) => {
   try {
     const username = req.params.username;
     const updatedUser = req.body;
-    const result = await mongodb.getDb().collection('users').updateOne(
-      { username: username },
-      { $set: updatedUser }
-    );
+    const result = await User.updateOne({ username }, { $set: updatedUser });
     if (result.matchedCount > 0) {
       res.status(200).json({ message: "User updated successfully." });
     } else {
@@ -56,7 +53,7 @@ userController.updateUserByUsername = async (req, res) => {
 userController.deleteUserByUsername = async (req, res) => {
   try {
     const username = req.params.username;
-    const result = await mongodb.getDb().collection('users').deleteOne({ username: username });
+    const result = await User.deleteOne({ username });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "User deleted successfully." });
     } else {

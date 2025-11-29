@@ -1,11 +1,10 @@
-const mongodb = require('../db/connect');
-const ObjectId = require('mongodb').ObjectId;
+const Pokemon = require('../models/Pokemon');
 const pokemonsController = {};
 
 // Get all pokemons
 pokemonsController.getAllPokemons = async (req, res) => {
   try {
-    const pokemons = await mongodb.getDb().collection('pokemons').find().toArray();
+    const pokemons = await Pokemon.find().lean();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(pokemons);
   } catch (err) {
@@ -17,8 +16,7 @@ pokemonsController.getAllPokemons = async (req, res) => {
 // Get a single pokemon by ID
 pokemonsController.getPokemonById = async (req, res) => {
   try {
-    const pokemonId = new ObjectId(req.params.id);
-    const pokemon = await mongodb.getDb().collection('pokemons').findOne({ _id: pokemonId });
+    const pokemon = await Pokemon.findById(req.params.id).lean();
     if (pokemon) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(pokemon);

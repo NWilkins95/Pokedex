@@ -1,11 +1,11 @@
-const mongodb = require('../db/connect');
-const { ObjectId } = require('mongodb');
+const BattleTeam = require('../models/BattleTeam');
+const mongoose = require('mongoose');
 const battle_teamController = {};
 
 // Get all battle teams
 battle_teamController.getAllBattleTeams = async (req, res) => {
   try {
-    const teams = await mongodb.getDb().collection('battle_teams').find().toArray();
+    const teams = await BattleTeam.find().lean();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(teams);
   } catch (err) {
@@ -17,8 +17,7 @@ battle_teamController.getAllBattleTeams = async (req, res) => {
 // Get a battle team by ID
 battle_teamController.getBattleTeamById = async (req, res) => {
   try {
-    const teamId = new ObjectId(req.params.id);
-    const team = await mongodb.getDb().collection('battle_teams').findOne({ _id: teamId });
+    const team = await BattleTeam.findById(req.params.id).lean();
     if (team) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(team);
@@ -35,7 +34,8 @@ battle_teamController.getBattleTeamById = async (req, res) => {
 battle_teamController.getBattleTeamByName = async (req, res) => {
   try {
     const teamName = req.params.name;
-    const teams = await mongodb.getDb().collection('battle_teams').find({ team_name: new RegExp(teamName, 'i') }).toArray();
+    // model field is `name_of_team`
+    const teams = await BattleTeam.find({ name_of_team: new RegExp(teamName, 'i') }).lean();
     if (teams.length > 0) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(teams);
@@ -61,16 +61,17 @@ battle_teamController.createBattleTeam = async (req, res) => {
       return res.status(400).json({ error: "Team can have a maximum of 6 Pokemon." });
     }
 
-    const newTeam = {
-      user_id: new ObjectId(user_id),
-      team_name,
-      custom_pokemon_ids: custom_pokemon_ids.map(id => new ObjectId(id)),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+    // Map incoming payload to model shape: store custom IDs in the `pokemon` array as `pokemon_id` entries.
+    const pokemonArr = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
 
-    const result = await mongodb.getDb().collection('battle_teams').insertOne(newTeam);
-    res.status(201).json({ message: "Battle team created successfully.", id: result.insertedId });
+    const newTeam = new BattleTeam({
+      user_id: mongoose.Types.ObjectId(user_id),
+      name_of_team: team_name,
+      pokemon: pokemonArr
+    });
+
+    const saved = await newTeam.save();
+    res.status(201).json({ message: "Battle team created successfully.", id: saved._id });
   } catch (err) {
     console.error("Error creating battle team:", err);
     res.status(500).json({ error: "An error occurred while creating the battle team." });
@@ -80,8 +81,7 @@ battle_teamController.createBattleTeam = async (req, res) => {
 // Update a battle team by ID
 battle_teamController.updateBattleTeamById = async (req, res) => {
   try {
-    const teamId = new ObjectId(req.params.id);
-    const { custom_pokemon_ids, ...otherUpdates } = req.body;
+    const { custom_pokemon_ids, team_name, ...otherUpdates } = req.body;
 
     // Validate max 6 Pokemon if updating pokemon list
     if (custom_pokemon_ids) {
@@ -93,16 +93,11 @@ battle_teamController.updateBattleTeamById = async (req, res) => {
       }
     }
 
-    const updatedData = {
-      ...otherUpdates,
-      ...(custom_pokemon_ids && { custom_pokemon_ids: custom_pokemon_ids.map(id => new ObjectId(id)) }),
-      updatedAt: new Date()
-    };
+    const updatedData = { ...otherUpdates };
+    if (team_name) updatedData.name_of_team = team_name;
+    if (custom_pokemon_ids) updatedData.pokemon = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
 
-    const result = await mongodb.getDb().collection('battle_teams').updateOne(
-      { _id: teamId },
-      { $set: updatedData }
-    );
+    const result = await BattleTeam.updateOne({ _id: req.params.id }, { $set: updatedData });
 
     if (result.matchedCount > 0) {
       res.status(200).json({ message: "Battle team updated successfully." });
@@ -118,8 +113,7 @@ battle_teamController.updateBattleTeamById = async (req, res) => {
 // Delete a battle team by ID
 battle_teamController.deleteBattleTeamById = async (req, res) => {
   try {
-    const teamId = new ObjectId(req.params.id);
-    const result = await mongodb.getDb().collection('battle_teams').deleteOne({ _id: teamId });
+    const result = await BattleTeam.deleteOne({ _id: req.params.id });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "Battle team deleted successfully." });
     } else {
