@@ -1,12 +1,13 @@
-const mongodb = require('../db/connect');
-const { ObjectId } = require('mongodb');
+const CustomPokemon = require('../models/CustomPokemon');
+const Pokemon = require('../models/Pokemon');
+const mongoose = require('mongoose');
 const { validateMoves } = require('../utils/moveValidator');
 const customPokemonController = {};
 
 // Get all custom pokemons
 customPokemonController.getAllCustomPokemons = async (req, res) => {
   try {
-    const customPokemons = await mongodb.getDb().collection('custompokemons').find().toArray();
+    const customPokemons = await CustomPokemon.find().lean();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(customPokemons);
   } catch (err) {
@@ -18,8 +19,7 @@ customPokemonController.getAllCustomPokemons = async (req, res) => {
 // Get a single custom pokemon by ID
 customPokemonController.getCustomPokemonById = async (req, res) => {
   try {
-    const customPokemonId = new ObjectId(req.params.id);
-    const customPokemon = await mongodb.getDb().collection('custompokemons').findOne({ _id: customPokemonId });
+    const customPokemon = await CustomPokemon.findById(req.params.id).lean();
     if (customPokemon) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(customPokemon);
@@ -36,7 +36,7 @@ customPokemonController.getCustomPokemonById = async (req, res) => {
 customPokemonController.getCustomPokemonByName = async (req, res) => {
   try {
     const nickname = req.params.name;
-    const customPokemons = await mongodb.getDb().collection('custompokemons').find({ nickname: new RegExp(nickname, 'i') }).toArray();
+    const customPokemons = await CustomPokemon.find({ nickname: new RegExp(nickname, 'i') }).lean();
     if (customPokemons.length > 0) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(customPokemons);
@@ -55,7 +55,7 @@ customPokemonController.createCustomPokemon = async (req, res) => {
     const { user_id, base_pokemon_id, nickname, level, ability, moves, stats } = req.body;
 
     // Get base pokemon to validate stats against max_stats
-    const basePokemon = await mongodb.getDb().collection('pokemons').findOne({ _id: new ObjectId(base_pokemon_id) });
+    const basePokemon = await Pokemon.findById(base_pokemon_id).lean();
     if (!basePokemon) {
       return res.status(404).json({ error: "Base pokemon not found." });
     }
@@ -89,22 +89,20 @@ customPokemonController.createCustomPokemon = async (req, res) => {
       });
     }
 
-    const newCustomPokemon = {
-      user_id: new ObjectId(user_id),
-      base_pokemon_id: new ObjectId(base_pokemon_id),
+    const newCustomPokemon = new CustomPokemon({
+      user_id: mongoose.Types.ObjectId(user_id),
+      base_pokemon_id: mongoose.Types.ObjectId(base_pokemon_id),
       nickname,
       level,
       ability,
-      moves: moves.map(id => new ObjectId(id)),
-      stats,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+      moves: moves.map(id => mongoose.Types.ObjectId(id)),
+      stats
+    });
 
-    const result = await mongodb.getDb().collection('custompokemons').insertOne(newCustomPokemon);
+    const saved = await newCustomPokemon.save();
     res.status(201).json({ 
       message: "Custom pokemon created successfully.", 
-      id: result.insertedId,
+      id: saved._id,
       max_stats: maxStats
     });
   } catch (err) {
@@ -116,12 +114,11 @@ customPokemonController.createCustomPokemon = async (req, res) => {
 // Update a custom pokemon by ID with move validation
 customPokemonController.updateCustomPokemonById = async (req, res) => {
   try {
-    const customPokemonId = new ObjectId(req.params.id);
     const { base_pokemon_id, level, moves, stats, ...otherUpdates } = req.body;
 
     // If stats are being updated, validate against max_stats
     if (stats && base_pokemon_id) {
-      const basePokemon = await mongodb.getDb().collection('pokemons').findOne({ _id: new ObjectId(base_pokemon_id) });
+      const basePokemon = await Pokemon.findById(base_pokemon_id).lean();
       if (!basePokemon) {
         return res.status(404).json({ error: "Base pokemon not found." });
       }
@@ -159,16 +156,12 @@ customPokemonController.updateCustomPokemonById = async (req, res) => {
 
     const updatedData = {
       ...otherUpdates,
-      ...(moves && { moves: moves.map(id => new ObjectId(id)) }),
+      ...(moves && { moves: moves.map(id => mongoose.Types.ObjectId(id)) }),
       ...(level && { level }),
-      ...(stats && { stats }),
-      updatedAt: new Date()
+      ...(stats && { stats })
     };
 
-    const result = await mongodb.getDb().collection('custompokemons').updateOne(
-      { _id: customPokemonId },
-      { $set: updatedData }
-    );
+    const result = await CustomPokemon.updateOne({ _id: req.params.id }, { $set: updatedData });
 
     if (result.matchedCount > 0) {
       res.status(200).json({ message: "Custom pokemon updated successfully." });
@@ -184,8 +177,7 @@ customPokemonController.updateCustomPokemonById = async (req, res) => {
 // Delete a custom pokemon by ID
 customPokemonController.deleteCustomPokemonById = async (req, res) => {
   try {
-    const customPokemonId = new ObjectId(req.params.id);
-    const result = await mongodb.getDb().collection('custompokemons').deleteOne({ _id: customPokemonId });
+    const result = await CustomPokemon.deleteOne({ _id: req.params.id });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "Custom pokemon deleted successfully." });
     } else {

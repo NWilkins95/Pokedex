@@ -1,5 +1,7 @@
-const mongodb = require('../db/connect');
-const { ObjectId } = require('mongodb');
+const TrainingGuide = require('../models/TrainingGuide');
+const CustomPokemon = require('../models/CustomPokemon');
+const Pokemon = require('../models/Pokemon');
+const mongoose = require('mongoose');
 const trainingGuideController = {};
 
 // Helper function to calculate stat from base, IV, EV, and level
@@ -15,13 +17,13 @@ const calculateStat = (base, iv, ev, level, isHP = false) => {
 const checkAchievability = async (customPokemonId, targetEVs, targetIVs) => {
   try {
     // Get the custom pokemon
-    const customPokemon = await mongodb.getDb().collection('custompokemons').findOne({ _id: new ObjectId(customPokemonId) });
+    const customPokemon = await CustomPokemon.findById(customPokemonId).lean();
     if (!customPokemon) {
       return { achievable: false, reason: "Custom pokemon not found" };
     }
 
     // Get the base pokemon stats
-    const basePokemon = await mongodb.getDb().collection('pokemons').findOne({ _id: new ObjectId(customPokemon.base_pokemon_id) });
+    const basePokemon = await Pokemon.findById(customPokemon.base_pokemon_id).lean();
     if (!basePokemon) {
       return { achievable: false, reason: "Base pokemon not found" };
     }
@@ -67,7 +69,7 @@ const checkAchievability = async (customPokemonId, targetEVs, targetIVs) => {
 // Get all training guides
 trainingGuideController.getAllTrainingGuides = async (req, res) => {
   try {
-    const guides = await mongodb.getDb().collection('trainingguides').find().toArray();
+    const guides = await TrainingGuide.find().lean();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(guides);
   } catch (err) {
@@ -79,8 +81,7 @@ trainingGuideController.getAllTrainingGuides = async (req, res) => {
 // Get a single training guide by ID
 trainingGuideController.getTrainingGuideById = async (req, res) => {
   try {
-    const guideId = new ObjectId(req.params.id);
-    const guide = await mongodb.getDb().collection('trainingguides').findOne({ _id: guideId });
+    const guide = await TrainingGuide.findById(req.params.id).lean();
     if (guide) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(guide);
@@ -96,8 +97,7 @@ trainingGuideController.getTrainingGuideById = async (req, res) => {
 // Get training guide by custom pokemon ID
 trainingGuideController.getTrainingGuideByPokemonId = async (req, res) => {
   try {
-    const pokemonId = new ObjectId(req.params.pokemonId);
-    const guide = await mongodb.getDb().collection('trainingguides').findOne({ custom_pokemon_id: pokemonId });
+    const guide = await TrainingGuide.findOne({ custom_pokemon_id: req.params.pokemonId }).lean();
     if (guide) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(guide);
@@ -124,22 +124,20 @@ trainingGuideController.createTrainingGuide = async (req, res) => {
     // Check achievability
     const achievabilityCheck = await checkAchievability(custom_pokemon_id, target_evs, target_ivs);
 
-    const newGuide = {
-      user_id: new ObjectId(user_id),
-      custom_pokemon_id: new ObjectId(custom_pokemon_id),
+    const newGuide = new TrainingGuide({
+      user_id: mongoose.Types.ObjectId(user_id),
+      custom_pokemon_id: mongoose.Types.ObjectId(custom_pokemon_id),
       target_evs,
       target_ivs,
       is_achievable: achievabilityCheck.achievable,
-      notes: notes || '',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+      notes: notes || ''
+    });
 
-    const result = await mongodb.getDb().collection('trainingguides').insertOne(newGuide);
+    const saved = await newGuide.save();
     
     res.status(201).json({ 
       message: "Training guide created successfully.", 
-      id: result.insertedId,
+      id: saved._id,
       achievability: achievabilityCheck
     });
   } catch (err) {
@@ -151,7 +149,6 @@ trainingGuideController.createTrainingGuide = async (req, res) => {
 // Update a training guide by ID
 trainingGuideController.updateTrainingGuideById = async (req, res) => {
   try {
-    const guideId = new ObjectId(req.params.id);
     const { target_evs, target_ivs, ...otherUpdates } = req.body;
 
     // Validate total EVs if provided
@@ -163,7 +160,7 @@ trainingGuideController.updateTrainingGuideById = async (req, res) => {
     }
 
     // Get existing guide to check achievability
-    const existingGuide = await mongodb.getDb().collection('trainingguides').findOne({ _id: guideId });
+    const existingGuide = await TrainingGuide.findById(req.params.id).lean();
     if (!existingGuide) {
       return res.status(404).json({ error: "Training guide not found." });
     }
@@ -182,12 +179,11 @@ trainingGuideController.updateTrainingGuideById = async (req, res) => {
       ...otherUpdates,
       ...(target_evs && { target_evs }),
       ...(target_ivs && { target_ivs }),
-      is_achievable: achievabilityCheck.achievable,
-      updatedAt: new Date()
+      is_achievable: achievabilityCheck.achievable
     };
 
-    const result = await mongodb.getDb().collection('trainingguides').updateOne(
-      { _id: guideId },
+    const result = await TrainingGuide.updateOne(
+      { _id: req.params.id },
       { $set: updatedData }
     );
 
@@ -208,8 +204,7 @@ trainingGuideController.updateTrainingGuideById = async (req, res) => {
 // Delete a training guide by ID
 trainingGuideController.deleteTrainingGuideById = async (req, res) => {
   try {
-    const guideId = new ObjectId(req.params.id);
-    const result = await mongodb.getDb().collection('trainingguides').deleteOne({ _id: guideId });
+    const result = await TrainingGuide.deleteOne({ _id: req.params.id });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "Training guide deleted successfully." });
     } else {

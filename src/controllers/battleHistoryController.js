@@ -1,11 +1,12 @@
-const mongodb = require('../db/connect');
-const { ObjectId } = require('mongodb');
+const BattleHistory = require('../models/BattleHistory');
+const BattleTeam = require('../models/BattleTeam');
+const mongoose = require('mongoose');
 const battleHistoryController = {};
 
 // Get all battle history records
 battleHistoryController.getAllBattleHistory = async (req, res) => {
   try {
-    const history = await mongodb.getDb().collection('battlehistories').find().toArray();
+    const history = await BattleHistory.find().lean();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(history);
   } catch (err) {
@@ -17,8 +18,7 @@ battleHistoryController.getAllBattleHistory = async (req, res) => {
 // Get a single battle history record by ID
 battleHistoryController.getBattleHistoryById = async (req, res) => {
   try {
-    const historyId = new ObjectId(req.params.id);
-    const history = await mongodb.getDb().collection('battlehistories').findOne({ _id: historyId });
+    const history = await BattleHistory.findById(req.params.id).lean();
     if (history) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(history);
@@ -34,8 +34,7 @@ battleHistoryController.getBattleHistoryById = async (req, res) => {
 // Get battle history by team ID
 battleHistoryController.getBattleHistoryByTeamId = async (req, res) => {
   try {
-    const teamId = new ObjectId(req.params.teamId);
-    const history = await mongodb.getDb().collection('battlehistories').find({ battle_team_id: teamId }).toArray();
+    const history = await BattleHistory.find({ battle_team_id: req.params.teamId }).lean();
     if (history.length > 0) {
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json(history);
@@ -52,19 +51,16 @@ battleHistoryController.getBattleHistoryByTeamId = async (req, res) => {
 battleHistoryController.getBattleHistoryByTeamName = async (req, res) => {
   try {
     const teamName = req.params.teamName;
-    
-    // First find the team(s) with this name
-    const teams = await mongodb.getDb().collection('battle_teams').find({ team_name: new RegExp(teamName, 'i') }).toArray();
-    
+
+    // First find the team(s) with this name (model field is `name_of_team`)
+    const teams = await BattleTeam.find({ name_of_team: new RegExp(teamName, 'i') }).lean();
+
     if (teams.length === 0) {
       return res.status(404).json({ error: "No teams found with that name." });
     }
 
-    // Get history for all teams with this name
     const teamIds = teams.map(team => team._id);
-    const history = await mongodb.getDb().collection('battlehistories').find({ 
-      battle_team_id: { $in: teamIds } 
-    }).toArray();
+    const history = await BattleHistory.find({ battle_team_id: { $in: teamIds } }).lean();
 
     if (history.length > 0) {
       res.setHeader('Content-Type', 'application/json');
@@ -88,18 +84,16 @@ battleHistoryController.createBattleHistory = async (req, res) => {
       return res.status(400).json({ error: "Result must be 'win', 'loss', or 'draw'." });
     }
 
-    const newHistory = {
-      user_id: new ObjectId(user_id),
-      battle_team_id: new ObjectId(battle_team_id),
+    const newHistory = new BattleHistory({
+      user_id: mongoose.Types.ObjectId(user_id),
+      battle_team_id: mongoose.Types.ObjectId(battle_team_id),
       battle_date: new Date(battle_date),
       result,
-      notes: notes || '',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+      notes: notes || ''
+    });
 
-    const result_db = await mongodb.getDb().collection('battlehistories').insertOne(newHistory);
-    res.status(201).json({ message: "Battle history record created successfully.", id: result_db.insertedId });
+    const saved = await newHistory.save();
+    res.status(201).json({ message: "Battle history record created successfully.", id: saved._id });
   } catch (err) {
     console.error("Error creating battle history:", err);
     res.status(500).json({ error: "An error occurred while creating the battle history record." });
@@ -109,7 +103,6 @@ battleHistoryController.createBattleHistory = async (req, res) => {
 // Update a battle history record by ID
 battleHistoryController.updateBattleHistoryById = async (req, res) => {
   try {
-    const historyId = new ObjectId(req.params.id);
     const { result, battle_date, ...otherUpdates } = req.body;
 
     // Validate result if provided
@@ -120,12 +113,11 @@ battleHistoryController.updateBattleHistoryById = async (req, res) => {
     const updatedData = {
       ...otherUpdates,
       ...(result && { result }),
-      ...(battle_date && { battle_date: new Date(battle_date) }),
-      updatedAt: new Date()
+      ...(battle_date && { battle_date: new Date(battle_date) })
     };
 
-    const result_db = await mongodb.getDb().collection('battlehistories').updateOne(
-      { _id: historyId },
+    const result_db = await BattleHistory.updateOne(
+      { _id: req.params.id },
       { $set: updatedData }
     );
 
@@ -143,8 +135,7 @@ battleHistoryController.updateBattleHistoryById = async (req, res) => {
 // Delete a battle history record by ID
 battleHistoryController.deleteBattleHistoryById = async (req, res) => {
   try {
-    const historyId = new ObjectId(req.params.id);
-    const result = await mongodb.getDb().collection('battlehistories').deleteOne({ _id: historyId });
+    const result = await BattleHistory.deleteOne({ _id: req.params.id });
     if (result.deletedCount > 0) {
       res.status(200).json({ message: "Battle history record deleted successfully." });
     } else {

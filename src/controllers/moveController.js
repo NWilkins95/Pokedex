@@ -1,14 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const { getLearnableMoves, validateMoves, getMovesGroupedByMethod } = require('../utils/moveValidator');
+const PokemonLearnset = require('../models/PokemonLearnset');
+const Move = require('../models/Move');
 const BattleTeam = require('../models/BattleTeam');
-const { handleErrors } = require('../utils/error');
+const { getLearnableMoves, validateMoves, getMovesGroupedByMethod } = require('../utils/moveValidator');
 
-/**
- * GET /api/pokemon/:pokemonId/moves
- * Get all moves a Pokemon can learn at a specific level
- */
-router.get('/pokemon/:pokemonId/moves', handleErrors(async (req, res) => {
+const moveController = {};
+
+// Get all moves a Pokemon can learn at a specific level
+moveController.getMovesForPokemon = async (req, res) => {
   const { pokemonId } = req.params;
   const { level = 100, groupBy } = req.query;
 
@@ -25,8 +23,8 @@ router.get('/pokemon/:pokemonId/moves', handleErrors(async (req, res) => {
   }
 
   const moves = await getLearnableMoves(pokemonId, currentLevel);
-  
-  res.json({
+
+  res.status(200).json({
     success: true,
     pokemon_id: pokemonId,
     level: currentLevel,
@@ -43,13 +41,10 @@ router.get('/pokemon/:pokemonId/moves', handleErrors(async (req, res) => {
       tm_hm_number: entry.tm_hm_number
     }))
   });
-}));
+};
 
-/**
- * POST /api/battle-team/:teamId/pokemon/:pokemonIndex/moves
- * Set moves for a Pokemon in a battle team with validation
- */
-router.post('/battle-team/:teamId/pokemon/:pokemonIndex/moves', handleErrors(async (req, res) => {
+// Assign moves to a Pokemon in a battle team with validation
+moveController.assignMovesToTeamPokemon = async (req, res) => {
   const { teamId, pokemonIndex } = req.params;
   const { moveIds } = req.body;
 
@@ -100,11 +95,11 @@ router.post('/battle-team/:teamId/pokemon/:pokemonIndex/moves', handleErrors(asy
 
   await team.save();
 
-  res.json({
+  res.status(200).json({
     success: true,
     message: 'Moves updated successfully',
     team: team
   });
-}));
+};
 
-module.exports = router;
+module.exports = moveController;
