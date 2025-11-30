@@ -168,7 +168,7 @@
     "/battle_teams/": {
       "get": {
         "tags": ["Battle Teams"],
-        "description": "Retrieve all battle teams.",
+        "description": "Retrieve all battle teams. Battle teams are groups of 1-6 custom Pokémon ready for competitive battles. Each team has a name and references custom Pokémon from /custom_pokemons.",
         "responses": {
           "200": {
             "description": "Battle teams returned successfully"
@@ -180,7 +180,7 @@
       },
       "post": {
         "tags": ["Battle Teams"],
-        "description": "Create a new battle team (requires authentication).",
+        "description": "Create a new battle team (requires authentication). Build a team with 1-6 custom Pokémon (must already exist in /custom_pokemons). Give your team a name and provide the custom_pokemon_ids array.",
         "security": [
           {
             "GitHubOAuth": []
@@ -192,7 +192,19 @@
             "in": "body",
             "schema": {
               "type": "object",
-              "description": "Battle team creation payload"
+              "description": "Battle team creation payload",
+              "example": {
+                "user_id": "507f1f77bcf86cd799439011",
+                "team_name": "Fire Sweep Squad",
+                "custom_pokemon_ids": [
+                  "507f1f77bcf86cd799439033",
+                  "507f1f77bcf86cd799439034",
+                  "507f1f77bcf86cd799439035",
+                  "507f1f77bcf86cd799439036",
+                  "507f1f77bcf86cd799439037",
+                  "507f1f77bcf86cd799439038"
+                ]
+              }
             }
           }
         ],
@@ -215,7 +227,7 @@
     "/battle_teams/{id}": {
       "get": {
         "tags": ["Battle Teams"],
-        "description": "Retrieve details of a specific battle team by ID (requires authentication).",
+        "description": "Retrieve details of a specific battle team by ID (requires authentication). Returns team name, user_id, and array of custom_pokemon_ids in the team.",
         "parameters": [
           {
             "name": "id",
@@ -338,7 +350,7 @@
     "/custom_pokemons/": {
       "get": {
         "tags": ["Custom Pokemons"],
-        "description": "Retrieve all custom Pokémon created by users.",
+        "description": "Retrieve all custom Pokémon created by users. Custom Pokémon are user-built Pokémon with specific moves, stats, level, and abilities selected from a base Pokémon.",
         "responses": {
           "200": {
             "description": "Custom Pokémon returned successfully"
@@ -350,7 +362,7 @@
       },
       "post": {
         "tags": ["Custom Pokemons"],
-        "description": "Create a new custom Pokémon (requires authentication).",
+        "description": "Create a new custom Pokémon (requires authentication). Select a base Pokémon and customize with 1-4 moves (must be legal for that Pokémon at the specified level), set level (1-100), ability, and stats (cannot exceed base Pokémon's max_stats). Response includes max_stats for reference.",
         "security": [
           {
             "GitHubOAuth": []
@@ -362,7 +374,28 @@
             "in": "body",
             "schema": {
               "type": "object",
-              "description": "Custom Pokémon creation payload"
+              "description": "Custom Pokémon creation payload",
+              "example": {
+                "user_id": "507f1f77bcf86cd799439011",
+                "base_pokemon_id": "507f191e810c19729de860ea",
+                "nickname": "Blaze",
+                "level": 50,
+                "ability": "Solar Power",
+                "moves": [
+                  "507f1f77bcf86cd799439012",
+                  "507f1f77bcf86cd799439013",
+                  "507f1f77bcf86cd799439014",
+                  "507f1f77bcf86cd799439015"
+                ],
+                "stats": {
+                  "hp": 266,
+                  "attack": 204,
+                  "defense": 192,
+                  "special_attack": 280,
+                  "special_defense": 206,
+                  "speed": 236
+                }
+              }
             }
           }
         ],
@@ -505,7 +538,7 @@
     "/battle_history/": {
       "get": {
         "tags": ["Battle History"],
-        "description": "Retrieve all recorded battle history.",
+        "description": "Retrieve all recorded battle history. Battle history tracks your team's performance in battles with date, result (win/loss/draw), and optional notes.",
         "responses": {
           "200": {
             "description": "Battle history returned successfully"
@@ -517,7 +550,7 @@
       },
       "post": {
         "tags": ["Battle History"],
-        "description": "Record a new battle history entry (requires authentication).",
+        "description": "Record a new battle history entry (requires authentication). Provide user_id, battle_team_id (from /battle_teams), battle_date, result ('win', 'loss', or 'draw'), and optional notes about the battle.",
         "security": [
           {
             "GitHubOAuth": []
@@ -529,7 +562,14 @@
             "in": "body",
             "schema": {
               "type": "object",
-              "description": "Battle history creation payload"
+              "description": "Battle history creation payload",
+              "example": {
+                "user_id": "507f1f77bcf86cd799439011",
+                "battle_team_id": "507f1f77bcf86cd799439022",
+                "battle_date": "2025-11-29T10:30:00.000Z",
+                "result": "win",
+                "notes": "Close match! Managed to sweep with Blaze after setting up."
+              }
             }
           }
         ],
@@ -700,7 +740,7 @@
     "/training_guides/": {
       "get": {
         "tags": ["Training Guides"],
-        "description": "Retrieve all training guides.",
+        "description": "Retrieve all training guides. Training guides help you find the right EV/IV spread to achieve your custom Pokémon's target stats. EVs: 0-255 per stat (max 510 total), IVs: 0-31 per stat.",
         "responses": {
           "200": {
             "description": "Training guides returned successfully"
@@ -712,7 +752,7 @@
       },
       "post": {
         "tags": ["Training Guides"],
-        "description": "Create a new training guide (requires authentication).",
+        "description": "Create a new training guide (requires authentication). Set target EVs (0-255 per stat, max 510 total) and IVs (0-31 per stat) to see if they achieve your custom Pokémon's target stats. Response includes 'is_achievable' boolean and calculated stats vs target stats comparison.",
         "security": [
           {
             "GitHubOAuth": []
@@ -724,7 +764,28 @@
             "in": "body",
             "schema": {
               "type": "object",
-              "description": "Training guide creation payload"
+              "description": "Training guide creation payload",
+              "example": {
+                "user_id": "507f1f77bcf86cd799439011",
+                "custom_pokemon_id": "507f1f77bcf86cd799439033",
+                "target_evs": {
+                  "hp": 4,
+                  "attack": 0,
+                  "defense": 0,
+                  "special_attack": 252,
+                  "special_defense": 0,
+                  "speed": 252
+                },
+                "target_ivs": {
+                  "hp": 31,
+                  "attack": 0,
+                  "defense": 31,
+                  "special_attack": 31,
+                  "special_defense": 31,
+                  "speed": 31
+                },
+                "notes": "Max special sweeper build - prioritizing Speed and Special Attack"
+              }
             }
           }
         ],
