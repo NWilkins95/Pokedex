@@ -52,7 +52,7 @@ customPokemonController.getCustomPokemonByName = async (req, res) => {
 // Create a new custom pokemon with move validation
 customPokemonController.createCustomPokemon = async (req, res) => {
   try {
-    const { user_id, base_pokemon_id, nickname, level, ability, moves, stats } = req.body;
+    const { base_pokemon_id, nickname, level, ability, moves, stats } = req.body;
 
     // Get base pokemon to validate stats against max_stats
     const basePokemon = await Pokemon.findById(base_pokemon_id).lean();
@@ -90,7 +90,6 @@ customPokemonController.createCustomPokemon = async (req, res) => {
     }
 
     const newCustomPokemon = new CustomPokemon({
-      user_id: mongoose.Types.ObjectId(user_id),
       base_pokemon_id: mongoose.Types.ObjectId(base_pokemon_id),
       nickname,
       level,

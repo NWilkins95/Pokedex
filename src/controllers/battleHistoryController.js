@@ -77,7 +77,7 @@ battleHistoryController.getBattleHistoryByTeamName = async (req, res) => {
 // Create a new battle history record
 battleHistoryController.createBattleHistory = async (req, res) => {
   try {
-    const { user_id, battle_team_id, battle_date, result, notes } = req.body;
+    const { battle_team_id, battle_date, result, notes } = req.body;
 
     // Validate result
     if (!['win', 'loss', 'draw'].includes(result)) {
@@ -85,7 +85,6 @@ battleHistoryController.createBattleHistory = async (req, res) => {
     }
 
     const newHistory = new BattleHistory({
-      user_id: mongoose.Types.ObjectId(user_id),
       battle_team_id: mongoose.Types.ObjectId(battle_team_id),
       battle_date: new Date(battle_date),
       result,

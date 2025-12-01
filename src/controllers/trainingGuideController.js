@@ -113,7 +113,7 @@ trainingGuideController.getTrainingGuideByPokemonId = async (req, res) => {
 // Create a new training guide
 trainingGuideController.createTrainingGuide = async (req, res) => {
   try {
-    const { user_id, custom_pokemon_id, target_evs, target_ivs, notes } = req.body;
+    const { custom_pokemon_id, target_evs, target_ivs, notes } = req.body;
 
     // Validate total EVs
     const totalEVs = Object.values(target_evs).reduce((sum, ev) => sum + ev, 0);
@@ -125,7 +125,6 @@ trainingGuideController.createTrainingGuide = async (req, res) => {
     const achievabilityCheck = await checkAchievability(custom_pokemon_id, target_evs, target_ivs);
 
     const newGuide = new TrainingGuide({
-      user_id: mongoose.Types.ObjectId(user_id),
       custom_pokemon_id: mongoose.Types.ObjectId(custom_pokemon_id),
       target_evs,
       target_ivs,

@@ -194,8 +194,7 @@
               "type": "object",
               "description": "Battle team creation payload",
               "example": {
-                "user_id": "507f1f77bcf86cd799439011",
-                "team_name": "Fire Sweep Squad",
+                "name_of_team": "Fire Sweep Squad",
                 "custom_pokemon_ids": [
                   "507f1f77bcf86cd799439033",
                   "507f1f77bcf86cd799439034",
@@ -227,7 +226,7 @@
     "/battle_teams/{id}": {
       "get": {
         "tags": ["Battle Teams"],
-        "description": "Retrieve details of a specific battle team by ID (requires authentication). Returns team name, user_id, and array of custom_pokemon_ids in the team.",
+        "description": "Retrieve details of a specific battle team by ID (requires authentication). Returns team name, and array of custom_pokemon_ids in the team.",
         "parameters": [
           {
             "name": "id",
@@ -376,7 +375,6 @@
               "type": "object",
               "description": "Custom Pokémon creation payload",
               "example": {
-                "user_id": "507f1f77bcf86cd799439011",
                 "base_pokemon_id": "507f191e810c19729de860ea",
                 "nickname": "Blaze",
                 "level": 50,
@@ -550,7 +548,7 @@
       },
       "post": {
         "tags": ["Battle History"],
-        "description": "Record a new battle history entry (requires authentication). Provide user_id, battle_team_id (from /battle_teams), battle_date, result ('win', 'loss', or 'draw'), and optional notes about the battle.",
+        "description": "Record a new battle history entry (requires authentication). Provide battle_team_id (from /battle_teams), battle_date, result ('win', 'loss', or 'draw'), and optional notes about the battle.",
         "security": [
           {
             "GitHubOAuth": []
@@ -564,7 +562,6 @@
               "type": "object",
               "description": "Battle history creation payload",
               "example": {
-                "user_id": "507f1f77bcf86cd799439011",
                 "battle_team_id": "507f1f77bcf86cd799439022",
                 "battle_date": "2025-11-29T10:30:00.000Z",
                 "result": "win",
@@ -766,7 +763,6 @@
               "type": "object",
               "description": "Training guide creation payload",
               "example": {
-                "user_id": "507f1f77bcf86cd799439011",
                 "custom_pokemon_id": "507f1f77bcf86cd799439033",
                 "target_evs": {
                   "hp": 4,
