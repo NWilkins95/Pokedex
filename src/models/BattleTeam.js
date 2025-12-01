@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const battleTeamSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
   name_of_team: {
     type: String,
     required: true,
