@@ -51,7 +51,7 @@ battle_teamController.getBattleTeamByName = async (req, res) => {
 // Create a new battle team
 battle_teamController.createBattleTeam = async (req, res) => {
   try {
-    const { user_id, team_name, custom_pokemon_ids } = req.body;
+    const { name_of_team, custom_pokemon_ids } = req.body;
 
     // Validate max 6 Pokemon
     if (!custom_pokemon_ids || custom_pokemon_ids.length === 0) {
@@ -65,8 +65,7 @@ battle_teamController.createBattleTeam = async (req, res) => {
     const pokemonArr = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
 
     const newTeam = new BattleTeam({
-      user_id: mongoose.Types.ObjectId(user_id),
-      name_of_team: team_name,
+      name_of_team: name_of_team,
       pokemon: pokemonArr
     });
 
