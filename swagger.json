@@ -226,7 +226,7 @@
     "/battle_teams/{id}": {
       "get": {
         "tags": ["Battle Teams"],
-        "description": "Retrieve details of a specific battle team by ID (requires authentication). Returns team name, user_id, and array of custom_pokemon_ids in the team.",
+        "description": "Retrieve details of a specific battle team by ID (requires authentication). Returns team name, and array of custom_pokemon_ids in the team.",
         "parameters": [
           {
             "name": "id",
@@ -548,7 +548,7 @@
       },
       "post": {
         "tags": ["Battle History"],
-        "description": "Record a new battle history entry (requires authentication). Provide user_id, battle_team_id (from /battle_teams), battle_date, result ('win', 'loss', or 'draw'), and optional notes about the battle.",
+        "description": "Record a new battle history entry (requires authentication). Provide battle_team_id (from /battle_teams), battle_date, result ('win', 'loss', or 'draw'), and optional notes about the battle.",
         "security": [
           {
             "GitHubOAuth": []
