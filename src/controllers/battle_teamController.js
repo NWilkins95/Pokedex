@@ -72,10 +72,10 @@ battle_teamController.createBattleTeam = async (req, res) => {
 // Update a battle team by ID
 battle_teamController.updateBattleTeamById = async (req, res) => {
   try {
-    const { custom_pokemon_ids, team_name, ...otherUpdates } = req.body;
+    const { custom_pokemon_ids, name_of_team, ...otherUpdates } = req.body;
 
     const updatedData = { ...otherUpdates };
-    if (team_name) updatedData.name_of_team = team_name;
+    if (name_of_team) updatedData.name_of_team = name_of_team;
     if (custom_pokemon_ids) updatedData.pokemon = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
 
     const result = await BattleTeam.updateOne({ _id: req.params.id }, { $set: updatedData });

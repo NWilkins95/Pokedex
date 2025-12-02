@@ -55,7 +55,7 @@ const validateBattleTeamCreate = (req, res, next) => {
 
 const validateBattleTeamUpdate = (req, res, next) => {
 	const rules = {
-		team_name: 'string|max:100',
+		name_of_team: 'string|max:100',
 		custom_pokemon_ids: 'array'
 	};
 
@@ -132,7 +132,7 @@ const validateCustomPokemonCreate = (req, res, next) => {
 		base_pokemon_id: 'required|string',
 		nickname: 'required|string|max:100',
 		level: 'required|integer|min:1|max:100',
-		ability: 'string',
+		ability: 'required|string',
 		moves: 'required|array',
 		stats: 'required|object'
 	};
@@ -144,19 +144,31 @@ const validateCustomPokemonCreate = (req, res, next) => {
 			}
 
 			const moves = req.body.moves || [];
-			if (!Array.isArray(moves)) return respondValidationError({ moves: ['Moves must be an array'] }, next);
-			if (moves.length > 4) return respondValidationError({ moves: ['A pokemon can have a maximum of 4 moves'] }, next);
+			if (!Array.isArray(moves)) {
+                return respondValidationError({ moves: ['Moves must be an array'] }, next);
+            } 
+			if (moves.length > 4) {
+                return respondValidationError({ moves: ['A pokemon can have a maximum of 4 moves'] }, next);
+            }
 			const invalidMoves = moves.filter(m => !isObjectId(m));
-			if (invalidMoves.length > 0) return respondValidationError({ moves: [`Invalid move id(s): ${invalidMoves.join(', ')}`] }, next);
+			if (invalidMoves.length > 0) {
+                return respondValidationError({ moves: [`Invalid move id(s): ${invalidMoves.join(', ')}`] }, next);
+            }
 
 			const stats = req.body.stats || {};
 			const statKeys = ['hp','attack','defense','special_attack','special_defense','speed'];
 			const statErrors = [];
 			statKeys.forEach(k => {
-				if (typeof stats[k] !== 'number') statErrors.push(`${k} must be a number`);
-				else if (stats[k] < 0) statErrors.push(`${k} must be >= 0`);
+				if (typeof stats[k] !== 'number') {
+                    statErrors.push(`${k} must be a number`);
+                } 
+				else if (stats[k] < 1) {
+                    statErrors.push(`${k} must be >= 1`);
+                }
 			});
-			if (statErrors.length > 0) return respondValidationError({ stats: statErrors }, next);
+			if (statErrors.length > 0) {
+                return respondValidationError({ stats: statErrors }, next);
+            }
 
 			return next();
 		}
@@ -182,10 +194,16 @@ const validateCustomPokemonUpdate = (req, res, next) => {
 			}
 
 			if (req.body.moves) {
-				if (!Array.isArray(req.body.moves)) return respondValidationError({ moves: ['Moves must be an array'] }, next);
-				if (req.body.moves.length > 4) return respondValidationError({ moves: ['A pokemon can have a maximum of 4 moves'] }, next);
+				if (!Array.isArray(req.body.moves)) {
+                    return respondValidationError({ moves: ['Moves must be an array'] }, next);
+                }
+				if (req.body.moves.length > 4) {
+                    return respondValidationError({ moves: ['A pokemon can have a maximum of 4 moves'] }, next);
+                }
 				const invalidMoves = req.body.moves.filter(m => !isObjectId(m));
-				if (invalidMoves.length > 0) return respondValidationError({ moves: [`Invalid move id(s): ${invalidMoves.join(', ')}`] }, next);
+				if (invalidMoves.length > 0) {
+                    return respondValidationError({ moves: [`Invalid move id(s): ${invalidMoves.join(', ')}`] }, next);
+                }
 			}
 
 			if (req.body.stats) {
@@ -193,10 +211,16 @@ const validateCustomPokemonUpdate = (req, res, next) => {
 				const statKeys = ['hp','attack','defense','special_attack','special_defense','speed'];
 				const statErrors = [];
 				statKeys.forEach(k => {
-					if (stats[k] !== undefined && typeof stats[k] !== 'number') statErrors.push(`${k} must be a number`);
-					else if (stats[k] !== undefined && stats[k] < 0) statErrors.push(`${k} must be >= 0`);
+					if (stats[k] !== undefined && typeof stats[k] !== 'number') { 
+                        statErrors.push(`${k} must be a number`);
+                     }
+					else if (stats[k] !== undefined && stats[k] < 1)  {
+                        statErrors.push(`${k} must be >= 1`);
+                    }
 				});
-				if (statErrors.length > 0) return respondValidationError({ stats: statErrors }, next);
+				if (statErrors.length > 0) {
+                    return respondValidationError({ stats: statErrors }, next);
+                }
 			}
 
 			return next();
@@ -213,10 +237,14 @@ const validateGetMovesForPokemon = (req, res, next) => {
 
 	validator(req.params, rules, {}, (errors, isValid) => {
 		if (isValid) {
-			if (!isObjectId(req.params.pokemonId)) return respondValidationError({ pokemonId: ['Invalid pokemonId'] }, next);
+			if (!isObjectId(req.params.pokemonId)) {
+                return respondValidationError({ pokemonId: ['Invalid pokemonId'] }, next);
+            }
 			if (req.query && req.query.level) {
 				const lvl = parseInt(req.query.level, 10);
-				if (isNaN(lvl) || lvl < 1 || lvl > 100) return respondValidationError({ level: ['Level must be an integer between 1 and 100'] }, next);
+				if (isNaN(lvl) || lvl < 1 || lvl > 100) {
+                    return respondValidationError({ level: ['Level must be an integer between 1 and 100'] }, next);
+                }
 			}
 			return next();
 		}
@@ -232,21 +260,39 @@ const validateAssignMovesToTeamPokemon = (req, res, next) => {
 	};
 
 	validator(req.params, paramRules, {}, (errors, isValid) => {
-		if (!isValid) return respondValidationError(errors, next);
+		if (!isValid) {
+            return respondValidationError(errors, next);
+        }
 
-		if (!isObjectId(req.params.teamId)) return respondValidationError({ teamId: ['Invalid teamId'] }, next);
-		if (isNaN(parseInt(req.params.pokemonIndex, 10))) return respondValidationError({ pokemonIndex: ['Invalid pokemonIndex'] }, next);
+		if (!isObjectId(req.params.teamId)) {
+            return respondValidationError({ teamId: ['Invalid teamId'] }, next);
+        }
+		const idx = parseInt(req.params.pokemonIndex, 10);
+		if (isNaN(idx)) {
+            return respondValidationError({ pokemonIndex: ['Invalid pokemonIndex'] }, next);
+        }
+		if (idx < 0 || idx > 5) {
+            return respondValidationError({ pokemonIndex: ['pokemonIndex must be between 0 and 5'] }, next);
+        }
 
 		// validate body.moveIds
 		const bodyRules = { moveIds: 'required|array' };
 		validator(req.body, bodyRules, {}, (bErrors, bIsValid) => {
-			if (!bIsValid) return respondValidationError(bErrors, next);
+			if (!bIsValid) {
+                return respondValidationError(bErrors, next);
+            }
 
 			const moveIds = req.body.moveIds || [];
-			if (!Array.isArray(moveIds)) return respondValidationError({ moveIds: ['moveIds must be an array'] }, next);
-			if (moveIds.length > 4) return respondValidationError({ moveIds: ['A pokemon can have a maximum of 4 moves'] }, next);
+			if (!Array.isArray(moveIds)) {
+                return respondValidationError({ moveIds: ['moveIds must be an array'] }, next);
+            }
+			if (moveIds.length > 4) {
+                return respondValidationError({ moveIds: ['A pokemon can have a maximum of 4 moves'] }, next);
+            }
 			const invalid = moveIds.filter(m => !isObjectId(m));
-			if (invalid.length > 0) return respondValidationError({ moveIds: [`Invalid move id(s): ${invalid.join(', ')}`] }, next);
+			if (invalid.length > 0) {
+                return respondValidationError({ moveIds: [`Invalid move id(s): ${invalid.join(', ')}`] }, next);
+            }
 
 			return next();
 		});
@@ -262,27 +308,43 @@ const validateTrainingGuideCreate = (req, res, next) => {
 
 	validator(req.body, rules, {}, (errors, isValid) => {
 		if (isValid) {
-			if (!isObjectId(req.body.custom_pokemon_id)) return respondValidationError({ custom_pokemon_id: ['Invalid custom_pokemon_id'] }, next);
+			if (!isObjectId(req.body.custom_pokemon_id)) {
+                return respondValidationError({ custom_pokemon_id: ['Invalid custom_pokemon_id'] }, next);
+            }
 
 			const evs = req.body.target_evs || {};
 			const ivs = req.body.target_ivs || {};
 			const statKeys = ['hp','attack','defense','special_attack','special_defense','speed'];
 			const evErrors = [];
 			statKeys.forEach(k => {
-				if (typeof evs[k] !== 'number') evErrors.push(`${k} EV must be a number`);
-				else if (evs[k] < 0 || evs[k] > 252) evErrors.push(`${k} EV must be between 0 and 252`);
+				if (typeof evs[k] !== 'number') { 
+                    evErrors.push(`${k} EV must be a number`); 
+                }
+				else if (evs[k] < 0 || evs[k] > 255) { 
+                    evErrors.push(`${k} EV must be between 0 and 255`); 
+                }
 			});
-			if (evErrors.length > 0) return respondValidationError({ target_evs: evErrors }, next);
+			if (evErrors.length > 0) {
+                return respondValidationError({ target_evs: evErrors }, next);
+            }
 
 			const ivErrors = [];
 			statKeys.forEach(k => {
-				if (typeof ivs[k] !== 'number') ivErrors.push(`${k} IV must be a number`);
-				else if (ivs[k] < 0 || ivs[k] > 31) ivErrors.push(`${k} IV must be between 0 and 31`);
+				if (typeof ivs[k] !== 'number') { 
+                    ivErrors.push(`${k} IV must be a number`); 
+                }
+				else if (ivs[k] < 0 || ivs[k] > 31) { 
+                    ivErrors.push(`${k} IV must be between 0 and 31`); 
+                }
 			});
-			if (ivErrors.length > 0) return respondValidationError({ target_ivs: ivErrors }, next);
+			if (ivErrors.length > 0) {
+                return respondValidationError({ target_ivs: ivErrors }, next);
+            }
 
 			const totalEVs = Object.values(evs).reduce((s, v) => s + v, 0);
-			if (totalEVs > 510) return respondValidationError({ target_evs: [`Total EVs cannot exceed 510. Current total: ${totalEVs}`] }, next);
+			if (totalEVs > 510) {
+                return respondValidationError({ target_evs: [`Total EVs cannot exceed 510. Current total: ${totalEVs}`] }, next);
+            }
 
 			return next();
 		}
@@ -304,12 +366,20 @@ const validateTrainingGuideUpdate = (req, res, next) => {
 				const statKeys = ['hp','attack','defense','special_attack','special_defense','speed'];
 				const evErrors = [];
 				statKeys.forEach(k => {
-					if (evs[k] !== undefined && typeof evs[k] !== 'number') evErrors.push(`${k} EV must be a number`);
-					else if (evs[k] !== undefined && (evs[k] < 0 || evs[k] > 252)) evErrors.push(`${k} EV must be between 0 and 252`);
+					if (evs[k] !== undefined && typeof evs[k] !== 'number') { 
+                        evErrors.push(`${k} EV must be a number`); 
+                    }
+					else if (evs[k] !== undefined && (evs[k] < 0 || evs[k] > 255)) { 
+                        evErrors.push(`${k} EV must be between 0 and 255`); 
+                    }
 				});
-				if (evErrors.length > 0) return respondValidationError({ target_evs: evErrors }, next);
+				if (evErrors.length > 0) {
+                    return respondValidationError({ target_evs: evErrors }, next);
+                }
 				const totalEVs = Object.values(evs).reduce((s, v) => s + v, 0);
-				if (totalEVs > 510) return respondValidationError({ target_evs: [`Total EVs cannot exceed 510. Current total: ${totalEVs}`] }, next);
+				if (totalEVs > 510) {
+                    return respondValidationError({ target_evs: [`Total EVs cannot exceed 510. Current total: ${totalEVs}`] }, next);
+                }
 			}
 
 			if (req.body.target_ivs) {
@@ -317,10 +387,16 @@ const validateTrainingGuideUpdate = (req, res, next) => {
 				const statKeys = ['hp','attack','defense','special_attack','special_defense','speed'];
 				const ivErrors = [];
 				statKeys.forEach(k => {
-					if (ivs[k] !== undefined && typeof ivs[k] !== 'number') ivErrors.push(`${k} IV must be a number`);
-					else if (ivs[k] !== undefined && (ivs[k] < 0 || ivs[k] > 31)) ivErrors.push(`${k} IV must be between 0 and 31`);
+					if (ivs[k] !== undefined && typeof ivs[k] !== 'number') { 
+                        ivErrors.push(`${k} IV must be a number`); 
+                    }
+					else if (ivs[k] !== undefined && (ivs[k] < 0 || ivs[k] > 31)) { 
+                        ivErrors.push(`${k} IV must be between 0 and 31`); 
+                    }
 				});
-				if (ivErrors.length > 0) return respondValidationError({ target_ivs: ivErrors }, next);
+				if (ivErrors.length > 0) {
+                    return respondValidationError({ target_ivs: ivErrors }, next);
+                }
 			}
 
 			return next();
@@ -339,8 +415,12 @@ const validateIdParam = (paramName) => (req, res, next) => {
 	const rules = {};
 	rules[paramName] = 'required|string';
 	validator(req.params, rules, {}, (errors, isValid) => {
-		if (!isValid) return respondValidationError(errors, next);
-		if (!isObjectId(req.params[paramName])) return respondValidationError({ [paramName]: ['Invalid id'] }, next);
+		if (!isValid) {
+            return respondValidationError(errors, next);
+		}
+		if (!isObjectId(req.params[paramName])) {
+            return respondValidationError({ [paramName]: ['Invalid id'] }, next);
+		}
 		return next();
 	});
 };
@@ -349,7 +429,9 @@ const validateNameParam = (paramName) => (req, res, next) => {
 	const rules = {};
 	rules[paramName] = 'required|string';
 	validator(req.params, rules, {}, (errors, isValid) => {
-		if (!isValid) return respondValidationError(errors, next);
+		if (!isValid) {
+            return respondValidationError(errors, next);
+		}
 		return next();
 	});
 };
