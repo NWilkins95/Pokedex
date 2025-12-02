@@ -53,14 +53,6 @@ battle_teamController.createBattleTeam = async (req, res) => {
   try {
     const { name_of_team, custom_pokemon_ids } = req.body;
 
-    // Validate max 6 Pokemon
-    if (!custom_pokemon_ids || custom_pokemon_ids.length === 0) {
-      return res.status(400).json({ error: "Team must have at least 1 Pokemon." });
-    }
-    if (custom_pokemon_ids.length > 6) {
-      return res.status(400).json({ error: "Team can have a maximum of 6 Pokemon." });
-    }
-
     // Map incoming payload to model shape: store custom IDs in the `pokemon` array as `pokemon_id` entries.
     const pokemonArr = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
 
@@ -80,20 +72,10 @@ battle_teamController.createBattleTeam = async (req, res) => {
 // Update a battle team by ID
 battle_teamController.updateBattleTeamById = async (req, res) => {
   try {
-    const { custom_pokemon_ids, team_name, ...otherUpdates } = req.body;
-
-    // Validate max 6 Pokemon if updating pokemon list
-    if (custom_pokemon_ids) {
-      if (custom_pokemon_ids.length === 0) {
-        return res.status(400).json({ error: "Team must have at least 1 Pokemon." });
-      }
-      if (custom_pokemon_ids.length > 6) {
-        return res.status(400).json({ error: "Team can have a maximum of 6 Pokemon." });
-      }
-    }
+    const { custom_pokemon_ids, name_of_team, ...otherUpdates } = req.body;
 
     const updatedData = { ...otherUpdates };
-    if (team_name) updatedData.name_of_team = team_name;
+    if (name_of_team) updatedData.name_of_team = name_of_team;
     if (custom_pokemon_ids) updatedData.pokemon = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
 
     const result = await BattleTeam.updateOne({ _id: req.params.id }, { $set: updatedData });

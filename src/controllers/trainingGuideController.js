@@ -115,12 +115,6 @@ trainingGuideController.createTrainingGuide = async (req, res) => {
   try {
     const { custom_pokemon_id, target_evs, target_ivs, notes } = req.body;
 
-    // Validate total EVs
-    const totalEVs = Object.values(target_evs).reduce((sum, ev) => sum + ev, 0);
-    if (totalEVs > 510) {
-      return res.status(400).json({ error: "Total EVs cannot exceed 510. Current total: " + totalEVs });
-    }
-
     // Check achievability
     const achievabilityCheck = await checkAchievability(custom_pokemon_id, target_evs, target_ivs);
 
@@ -149,14 +143,6 @@ trainingGuideController.createTrainingGuide = async (req, res) => {
 trainingGuideController.updateTrainingGuideById = async (req, res) => {
   try {
     const { target_evs, target_ivs, ...otherUpdates } = req.body;
-
-    // Validate total EVs if provided
-    if (target_evs) {
-      const totalEVs = Object.values(target_evs).reduce((sum, ev) => sum + ev, 0);
-      if (totalEVs > 510) {
-        return res.status(400).json({ error: "Total EVs cannot exceed 510. Current total: " + totalEVs });
-      }
-    }
 
     // Get existing guide to check achievability
     const existingGuide = await TrainingGuide.findById(req.params.id).lean();
@@ -219,12 +205,6 @@ trainingGuideController.deleteTrainingGuideById = async (req, res) => {
 trainingGuideController.checkAchievability = async (req, res) => {
   try {
     const { custom_pokemon_id, target_evs, target_ivs } = req.body;
-
-    // Validate total EVs
-    const totalEVs = Object.values(target_evs).reduce((sum, ev) => sum + ev, 0);
-    if (totalEVs > 510) {
-      return res.status(400).json({ error: "Total EVs cannot exceed 510. Current total: " + totalEVs });
-    }
 
     const achievabilityCheck = await checkAchievability(custom_pokemon_id, target_evs, target_ivs);
     

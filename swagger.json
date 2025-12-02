@@ -45,6 +45,9 @@
           "200": {
             "description": "List of Pokémon returned successfully"
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "500": {
             "description": "An error occurred while fetching pokemons."
           }
@@ -66,6 +69,9 @@
         "responses": {
           "200": {
             "description": "Pokémon details returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "404": {
             "description": "Pokemon not found."
@@ -103,6 +109,9 @@
         "responses": {
           "200": {
             "description": "Moves returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "500": {
             "description": "An error occurred while fetching moves."
@@ -153,6 +162,9 @@
           "200": {
             "description": "Moves updated successfully"
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Validation error (e.g. 'Pokemon can only have up to 4 moves' or 'Some moves cannot be learned by this Pokemon at the current level')."
           },
@@ -172,6 +184,9 @@
         "responses": {
           "200": {
             "description": "Battle teams returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "500": {
             "description": "An error occurred while fetching battle teams."
@@ -211,6 +226,9 @@
           "201": {
             "description": "Battle team created successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Validation error (e.g. 'Team must have at least 1 Pokemon.' or 'Team can have a maximum of 6 Pokemon.')."
           },
@@ -238,6 +256,9 @@
         "responses": {
           "200": {
             "description": "Battle team returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "401": {
             "description": "Unauthorized"
@@ -278,6 +299,9 @@
           "200": {
             "description": "Battle team updated successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Validation error (e.g. 'Team must have at least 1 Pokemon.' or 'Team can have a maximum of 6 Pokemon.')."
           },
@@ -312,6 +336,9 @@
           "200": {
             "description": "Battle team deleted successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -340,6 +367,9 @@
           "200": {
             "description": "Battle team returned successfully"
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "404": {
             "description": "No battle teams found with that name."
           }
@@ -353,6 +383,9 @@
         "responses": {
           "200": {
             "description": "Custom Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "500": {
             "description": "An error occurred while fetching custom pokemons."
@@ -401,6 +434,9 @@
           "201": {
             "description": "Custom pokemon created successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Validation error (e.g. 'Stats exceed pokemon's maximum values.' or move validation errors)."
           },
@@ -428,6 +464,9 @@
         "responses": {
           "200": {
             "description": "Custom Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "404": {
             "description": "Custom pokemon not found."
@@ -465,6 +504,9 @@
           "200": {
             "description": "Custom pokemon updated successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Validation error (e.g. 'Stats exceed pokemon's maximum values.' or move validation errors)."
           },
@@ -499,6 +541,9 @@
           "200": {
             "description": "Custom pokemon deleted successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -527,6 +572,9 @@
           "200": {
             "description": "Custom Pokémon returned successfully"
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "404": {
             "description": "No custom pokemons found with that name."
           }
@@ -540,6 +588,9 @@
         "responses": {
           "200": {
             "description": "Battle history returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "500": {
             "description": "An error occurred while fetching battle history."
@@ -574,6 +625,9 @@
           "201": {
             "description": "Battle history record created successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Result must be 'win', 'loss', or 'draw'."
           },
@@ -601,6 +655,9 @@
         "responses": {
           "200": {
             "description": "Battle history entry returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "404": {
             "description": "Battle history record not found."
@@ -638,6 +695,9 @@
           "200": {
             "description": "Battle history record updated successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Result must be 'win', 'loss', or 'draw'."
           },
@@ -672,6 +732,9 @@
           "200": {
             "description": "Battle history record deleted successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -700,6 +763,9 @@
           "200": {
             "description": "Battle history for the team returned successfully"
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "404": {
             "description": "No battle history found for this team."
           },
@@ -725,6 +791,9 @@
           "200": {
             "description": "Battle history for the team returned successfully"
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "404": {
             "description": "No teams found with that name OR No battle history found for teams with that name."
           },
@@ -741,6 +810,9 @@
         "responses": {
           "200": {
             "description": "Training guides returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "500": {
             "description": "An error occurred while fetching training guides."
@@ -789,6 +861,9 @@
           "201": {
             "description": "Training guide created successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Total EVs cannot exceed 510."
           },
@@ -816,6 +891,9 @@
         "responses": {
           "200": {
             "description": "Training guide returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "404": {
             "description": "Training guide not found."
@@ -853,6 +931,9 @@
           "200": {
             "description": "Training guide updated successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "400": {
             "description": "Total EVs cannot exceed 510."
           },
@@ -887,6 +968,9 @@
           "200": {
             "description": "Training guide deleted successfully."
           },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -914,6 +998,9 @@
         "responses": {
           "200": {
             "description": "Training guides for the Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "404": {
             "description": "No training guide found for this pokemon."
@@ -946,6 +1033,9 @@
         "responses": {
           "200": {
             "description": "Achievability result returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
           },
           "400": {
             "description": "Total EVs cannot exceed 510."
