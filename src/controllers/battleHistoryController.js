@@ -79,11 +79,6 @@ battleHistoryController.createBattleHistory = async (req, res) => {
   try {
     const { battle_team_id, battle_date, result, notes } = req.body;
 
-    // Validate result
-    if (!['win', 'loss', 'draw'].includes(result)) {
-      return res.status(400).json({ error: "Result must be 'win', 'loss', or 'draw'." });
-    }
-
     const newHistory = new BattleHistory({
       battle_team_id: mongoose.Types.ObjectId(battle_team_id),
       battle_date: new Date(battle_date),
@@ -103,11 +98,6 @@ battleHistoryController.createBattleHistory = async (req, res) => {
 battleHistoryController.updateBattleHistoryById = async (req, res) => {
   try {
     const { result, battle_date, ...otherUpdates } = req.body;
-
-    // Validate result if provided
-    if (result && !['win', 'loss', 'draw'].includes(result)) {
-      return res.status(400).json({ error: "Result must be 'win', 'loss', or 'draw'." });
-    }
 
     const updatedData = {
       ...otherUpdates,
