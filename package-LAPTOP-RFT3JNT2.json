@@ -1,0 +1,40 @@
+{
+  "name": "gen1-pokedex",
+  "version": "1.0.0",
+  "description": "Gen 1 Pokemon Pokedex with MongoDB",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node src/seed.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "pokemon",
+    "pokedex",
+    "gen1",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.2",
+    "mongodb": "^6.21.0",
+    "mongoose": "^8.20.0",
+    "passport": "^0.7.0",
+    "passport-github": "^1.1.0",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@shelf/jest-mongodb": "^6.0.2",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.1.4",
+    "swagger-autogen": "^2.23.7"
+  }
+}
