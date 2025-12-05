@@ -130,11 +130,11 @@ const validateBattleHistoryUpdate = (req, res, next) => {
 const validateCustomPokemonCreate = (req, res, next) => {
 	const rules = {
 		base_pokemon_id: 'required|string',
-		nickname: 'required|string|max:100',
+		nickname: 'optional|string|max:100',
 		level: 'required|integer|min:1|max:100',
 		ability: 'required|string',
 		moves: 'required|array',
-		stats: 'required|object'
+		stats: 'required'
 	};
 
 	validator(req.body, rules, {}, (errors, isValid) => {
@@ -184,7 +184,7 @@ const validateCustomPokemonUpdate = (req, res, next) => {
 		level: 'integer|min:1|max:100',
 		ability: 'string',
 		moves: 'array',
-		stats: 'object'
+		stats: 'required'
 	};
 
 	validator(req.body, rules, {}, (errors, isValid) => {
@@ -302,8 +302,8 @@ const validateAssignMovesToTeamPokemon = (req, res, next) => {
 const validateTrainingGuideCreate = (req, res, next) => {
 	const rules = {
 		custom_pokemon_id: 'required|string',
-		target_evs: 'required|object',
-		target_ivs: 'required|object'
+		target_evs: 'required',
+		target_ivs: 'required'
 	};
 
 	validator(req.body, rules, {}, (errors, isValid) => {
@@ -355,8 +355,8 @@ const validateTrainingGuideCreate = (req, res, next) => {
 
 const validateTrainingGuideUpdate = (req, res, next) => {
 	const rules = {
-		target_evs: 'object',
-		target_ivs: 'object'
+		target_evs: 'required',
+		target_ivs: 'required'
 	};
 
 	validator(req.body, rules, {}, (errors, isValid) => {
