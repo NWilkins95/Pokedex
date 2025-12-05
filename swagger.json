@@ -2,174 +2,1051 @@
   "swagger": "2.0",
   "info": {
     "title": "Pokedex",
-    "description": "An API to manage a Pokedex for the first generation of Pokemon. \n\n**Authentication Notice:**\n\nAll `POST`, `PUT`, and `DELETE` routes require authorization (indicated by the lock icon), in addition to the `GET` route to retrive a specific battle team. If you are not authenticated, [sign in via GitHub](https://pokedex-g9kr.onrender.com/login), after which you will be redirected back to the API documentation. Failure to do so will result in the API returning a `401 Unauthorized` as a response.\n\nTo end your session, [logout here](https://pokedex-g9kr.onrender.com/auth/logout).\n\nAll routes are wrapped in centralized error handling. POST and PUT routes include validation logic and may return `422 Unprocessable Entity` if input is invalid.\n\n_Not affiliated with Nintendo._",
+    "description": "An API to manage a Pokedex for the first generation of Pokemon.\n\n**Authentication Notice:**\n\nAll `POST`, `PUT`, and `DELETE` routes require authorization (indicated by the lock icon), in addition to the `GET` route to retrieve a specific battle team. If you are not authenticated, [sign in via GitHub](https://pokedex-g9kr.onrender.com/login), after which you will be redirected back to the API documentation. Failure to do so will result in the API returning a `401 Unauthorized` as a response.\n\nTo end your session, [logout here](https://pokedex-g9kr.onrender.com/auth/logout).\n\nAll routes are wrapped in centralized error handling. POST and PUT routes include validation logic and may return `422 Unprocessable Entity` if input is invalid.\n\n_Not affiliated with Nintendo._",
     "version": "1.0.0"
   },
   "host": "pokedex-g9kr.onrender.com",
   "basePath": "/",
-  "tags": [
-    { "name": "Pokemon", "description": "Endpoints related to Pokémon data" },
-    { "name": "Moves", "description": "Endpoints related to Pokémon moves" },
-    { "name": "Battle Teams", "description": "Endpoints for managing battle teams" },
-    { "name": "Users", "description": "Endpoints for user accounts and authentication" }
+  "schemes": [
+    "https"
   ],
-  "schemes": ["https"],
+  "tags": [
+    {
+      "name": "Pokemon",
+      "description": "Endpoints related to Pokémon data"
+    },
+    {
+      "name": "Custom Pokemons",
+      "description": "Endpoints for managing custom Pokémon"
+    },
+    {
+      "name": "Moves",
+      "description": "Endpoints related to Pokémon moves"
+    },
+    {
+      "name": "Battle Teams",
+      "description": "Endpoints for managing battle teams"
+    },
+    {
+      "name": "Battle History",
+      "description": "Endpoints for managing battle history"
+    },
+    {
+      "name": "Training Guides",
+      "description": "Endpoints for managing training guides"
+    }
+  ],
   "paths": {
     "/pokemons/": {
       "get": {
         "tags": ["Pokemon"],
-        "description": "Get all Pokémon",
-        "responses": { "200": { "description": "OK" }, "500": { "description": "Internal Server Error" } }
+        "description": "Retrieve a list of all first-generation Pokémon.",
+        "responses": {
+          "200": {
+            "description": "List of Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "500": {
+            "description": "An error occurred while fetching pokemons."
+          }
+        }
       }
     },
     "/pokemons/{id}": {
       "get": {
         "tags": ["Pokemon"],
-        "description": "Get a Pokémon by ID",
+        "description": "Retrieve details of a specific Pokémon by ID.",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
         ],
-        "responses": { "200": { "description": "OK" }, "500": { "description": "Internal Server Error" } }
+        "responses": {
+          "200": {
+            "description": "Pokémon details returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "Pokemon not found."
+          },
+          "500": {
+            "description": "An error occurred while fetching the pokemon."
+          }
+        }
       }
     },
     "/moves/pokemon/{pokemonId}/moves": {
       "get": {
         "tags": ["Moves"],
-        "description": "Get moves for a specific Pokémon",
+        "description": "Retrieve available moves for a specific Pokémon, optionally filtered by level or grouped.",
         "parameters": [
-          { "name": "pokemonId", "in": "path", "required": true, "type": "string" },
-          { "name": "level", "in": "query", "type": "string" },
-          { "name": "groupBy", "in": "query", "type": "string" }
+          {
+            "name": "pokemonId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "type": "string",
+            "description": "Optional minimum level to filter moves"
+          },
+          {
+            "name": "groupBy",
+            "in": "query",
+            "type": "string",
+            "description": "Optional grouping key (e.g., 'type', 'method')"
+          }
         ],
         "responses": {
-          "200": { "description": "OK" },
-          "500": { "description": "Internal Server Error" }
+          "200": {
+            "description": "Moves returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "500": {
+            "description": "An error occurred while fetching moves."
+          }
         }
       }
     },
     "/moves/battle-team/{teamId}/pokemon/{pokemonIndex}/moves": {
       "post": {
         "tags": ["Moves"],
-        "description": "Add moves to a Pokémon in a battle team",
+        "description": "Assign moves to a Pokémon within a battle team (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "teamId", "in": "path", "required": true, "type": "string" },
-          { "name": "pokemonIndex", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pokemonIndex",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Zero-based index of the Pokémon in the team"
+          },
           {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
-              "properties": { "moveIds": { "example": "any" } }
+              "properties": {
+                "moveIds": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Array of move IDs to assign"
+                }
+              },
+              "required": ["moveIds"]
             }
           }
         ],
         "responses": {
-          "200": { "description": "OK" },
-          "400": { "description": "Bad Request" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
+          "200": {
+            "description": "Moves updated successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Validation error (e.g. 'Pokemon can only have up to 4 moves' or 'Some moves cannot be learned by this Pokemon at the current level')."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Battle team not found OR Pokemon not found in team at this index"
+          }
+        }
+      }
+    },
+    "/battle_teams/": {
+      "get": {
+        "tags": ["Battle Teams"],
+        "description": "Retrieve all battle teams. Battle teams are groups of 1-6 custom Pokémon ready for competitive battles. Each team has a name and references custom Pokémon from /custom_pokemons.",
+        "responses": {
+          "200": {
+            "description": "Battle teams returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "500": {
+            "description": "An error occurred while fetching battle teams."
+          }
+        }
+      },
+      "post": {
+        "tags": ["Battle Teams"],
+        "description": "Create a new battle team (requires authentication). Build a team with 1-6 custom Pokémon (must already exist in /custom_pokemons). Give your team a name and provide the custom_pokemon_ids array.",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Battle team creation payload",
+              "example": {
+                "name_of_team": "Fire Sweep Squad",
+                "custom_pokemon_ids": [
+                  "507f1f77bcf86cd799439033",
+                  "507f1f77bcf86cd799439034",
+                  "507f1f77bcf86cd799439035",
+                  "507f1f77bcf86cd799439036",
+                  "507f1f77bcf86cd799439037",
+                  "507f1f77bcf86cd799439038"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Battle team created successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Validation error (e.g. 'Team must have at least 1 Pokemon.' or 'Team can have a maximum of 6 Pokemon.')."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "An error occurred while creating the battle team."
+          }
         }
       }
     },
     "/battle_teams/{id}": {
       "get": {
         "tags": ["Battle Teams"],
-        "description": "Get a battle team by ID",
-        "security": [
+        "description": "Retrieve details of a specific battle team by ID (requires authentication). Returns team name, and array of custom_pokemon_ids in the team.",
+        "parameters": [
           {
-            "GitHubOAuth": []
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
+        "responses": {
+          "200": {
+            "description": "Battle team returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Battle team not found."
+          },
+          "500": {
+            "description": "An error occurred while fetching the battle team."
+          }
+        }
       },
       "put": {
         "tags": ["Battle Teams"],
-        "description": "Update a battle team",
+        "description": "Update a specific battle team by ID (requires authentication).",
         "security": [
           {
             "GitHubOAuth": []
           }
         ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Battle team update payload"
+            }
+          }
         ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
+        "responses": {
+          "200": {
+            "description": "Battle team updated successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Validation error (e.g. 'Team must have at least 1 Pokemon.' or 'Team can have a maximum of 6 Pokemon.')."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Battle team not found."
+          },
+          "500": {
+            "description": "An error occurred while updating the battle team."
+          }
+        }
       },
       "delete": {
         "tags": ["Battle Teams"],
-        "description": "Delete a battle team",
+        "description": "Delete a specific battle team by ID (requires authentication).",
         "security": [
           {
             "GitHubOAuth": []
           }
         ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
-      }
-    },
-    "/battle_teams/": {
-      "post": {
-        "tags": ["Battle Teams"],
-        "description": "Create a new battle team",
-        "security": [
           {
-            "GitHubOAuth": []
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
+        "responses": {
+          "200": {
+            "description": "Battle team deleted successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Battle team not found."
+          },
+          "500": {
+            "description": "An error occurred while deleting the battle team."
+          }
+        }
       }
     },
-    "/users/{username}": {
+    "/battle_teams/name/{name}": {
       "get": {
-        "tags": ["Users"],
-        "description": "Get a user by username",
+        "tags": ["Battle Teams"],
+        "description": "Retrieve a battle team by its name.",
         "parameters": [
-          { "name": "username", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": { "200": { "description": "OK" }, "500": { "description": "Internal Server Error" } }
-      },
-      "put": {
-        "tags": ["Users"],
-        "description": "Update a user",
-        "security": [
           {
-            "GitHubOAuth": []
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
-        "parameters": [
-          { "name": "username", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
-      },
-      "delete": {
-        "tags": ["Users"],
-        "description": "Delete a user",
-        "security": [
-          {
-            "GitHubOAuth": []
+        "responses": {
+          "200": {
+            "description": "Battle team returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "No battle teams found with that name."
           }
-        ],
-        "parameters": [
-          { "name": "username", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
+        }
       }
     },
-    "/users/": {
+    "/custom_pokemons/": {
+      "get": {
+        "tags": ["Custom Pokemons"],
+        "description": "Retrieve all custom Pokémon created by users. Custom Pokémon are user-built Pokémon with specific moves, stats, level, and abilities selected from a base Pokémon.",
+        "responses": {
+          "200": {
+            "description": "Custom Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "500": {
+            "description": "An error occurred while fetching custom pokemons."
+          }
+        }
+      },
       "post": {
-        "tags": ["Users"],
-        "description": "Create a new user",
+        "tags": ["Custom Pokemons"],
+        "description": "Create a new custom Pokémon (requires authentication). Select a base Pokémon and customize with 1-4 moves (must be legal for that Pokémon at the specified level), set level (1-100), ability, and stats (cannot exceed base Pokémon's max_stats). Response includes max_stats for reference.",
         "security": [
           {
             "GitHubOAuth": []
           }
         ],
-        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "500": { "description": "Internal Server Error" } }
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Custom Pokémon creation payload",
+              "example": {
+                "base_pokemon_id": "507f191e810c19729de860ea",
+                "nickname": "Blaze",
+                "level": 50,
+                "ability": "Solar Power",
+                "moves": [
+                  "507f1f77bcf86cd799439012",
+                  "507f1f77bcf86cd799439013",
+                  "507f1f77bcf86cd799439014",
+                  "507f1f77bcf86cd799439015"
+                ],
+                "stats": {
+                  "hp": 266,
+                  "attack": 204,
+                  "defense": 192,
+                  "special_attack": 280,
+                  "special_defense": 206,
+                  "speed": 236
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Custom pokemon created successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Validation error (e.g. 'Stats exceed pokemon's maximum values.' or move validation errors)."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "An error occurred while creating the custom pokemon."
+          }
+        }
+      }
+    },
+    "/custom_pokemons/{id}": {
+      "get": {
+        "tags": ["Custom Pokemons"],
+        "description": "Retrieve details of a custom Pokémon by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Custom Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "Custom pokemon not found."
+          },
+          "500": {
+            "description": "An error occurred while fetching the custom pokemon."
+          }
+        }
+      },
+      "put": {
+        "tags": ["Custom Pokemons"],
+        "description": "Update a custom Pokémon by ID (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Custom Pokémon update payload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Custom pokemon updated successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Validation error (e.g. 'Stats exceed pokemon's maximum values.' or move validation errors)."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Custom pokemon not found."
+          },
+          "500": {
+            "description": "An error occurred while updating the custom pokemon."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Custom Pokemons"],
+        "description": "Delete a custom Pokémon by ID (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Custom pokemon deleted successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Custom pokemon not found."
+          },
+          "500": {
+            "description": "An error occurred while deleting the custom pokemon."
+          }
+        }
+      }
+    },
+    "/custom_pokemons/name/{name}": {
+      "get": {
+        "tags": ["Custom Pokemons"],
+        "description": "Retrieve a custom Pokémon by its name.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Custom Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "No custom pokemons found with that name."
+          }
+        }
+      }
+    },
+    "/battle_history/": {
+      "get": {
+        "tags": ["Battle History"],
+        "description": "Retrieve all recorded battle history. Battle history tracks your team's performance in battles with date, result (win/loss/draw), and optional notes.",
+        "responses": {
+          "200": {
+            "description": "Battle history returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "500": {
+            "description": "An error occurred while fetching battle history."
+          }
+        }
+      },
+      "post": {
+        "tags": ["Battle History"],
+        "description": "Record a new battle history entry (requires authentication). Provide battle_team_id (from /battle_teams), battle_date, result ('win', 'loss', or 'draw'), and optional notes about the battle.",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Battle history creation payload",
+              "example": {
+                "battle_team_id": "507f1f77bcf86cd799439022",
+                "battle_date": "2025-11-29T10:30:00.000Z",
+                "result": "win",
+                "notes": "Close match! Managed to sweep with Blaze after setting up."
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Battle history record created successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Result must be 'win', 'loss', or 'draw'."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "An error occurred while creating the battle history record."
+          }
+        }
+      }
+    },
+    "/battle_history/{id}": {
+      "get": {
+        "tags": ["Battle History"],
+        "description": "Retrieve details of a specific battle history entry by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Battle history entry returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "Battle history record not found."
+          },
+          "500": {
+            "description": "An error occurred while fetching the battle history record."
+          }
+        }
+      },
+      "put": {
+        "tags": ["Battle History"],
+        "description": "Update a specific battle history entry by ID (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Battle history update payload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Battle history record updated successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Result must be 'win', 'loss', or 'draw'."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Battle history record not found."
+          },
+          "500": {
+            "description": "An error occurred while updating the battle history record."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Battle History"],
+        "description": "Delete a specific battle history entry by ID (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Battle history record deleted successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Battle history record not found."
+          },
+          "500": {
+            "description": "An error occurred while deleting the battle history record."
+          }
+        }
+      }
+    },
+    "/battle_history/team/{teamId}": {
+      "get": {
+        "tags": ["Battle History"],
+        "description": "Retrieve battle history entries associated with a specific team ID.",
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Battle history for the team returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "No battle history found for this team."
+          },
+          "500": {
+            "description": "An error occurred while fetching battle history."
+          }
+        }
+      }
+    },
+    "/battle_history/team/name/{teamName}": {
+      "get": {
+        "tags": ["Battle History"],
+        "description": "Retrieve battle history entries associated with a specific team name.",
+        "parameters": [
+          {
+            "name": "teamName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Battle history for the team returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "No teams found with that name OR No battle history found for teams with that name."
+          },
+          "500": {
+            "description": "An error occurred while fetching battle history."
+          }
+        }
+      }
+    },
+    "/training_guides/": {
+      "get": {
+        "tags": ["Training Guides"],
+        "description": "Retrieve all training guides. Training guides help you find the right EV/IV spread to achieve your custom Pokémon's target stats. EVs: 0-255 per stat (max 510 total), IVs: 0-31 per stat.",
+        "responses": {
+          "200": {
+            "description": "Training guides returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "500": {
+            "description": "An error occurred while fetching training guides."
+          }
+        }
+      },
+      "post": {
+        "tags": ["Training Guides"],
+        "description": "Create a new training guide (requires authentication). Set target EVs (0-255 per stat, max 510 total) and IVs (0-31 per stat) to see if they achieve your custom Pokémon's target stats. Response includes 'is_achievable' boolean and calculated stats vs target stats comparison.",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Training guide creation payload",
+              "example": {
+                "custom_pokemon_id": "507f1f77bcf86cd799439033",
+                "target_evs": {
+                  "hp": 4,
+                  "attack": 0,
+                  "defense": 0,
+                  "special_attack": 252,
+                  "special_defense": 0,
+                  "speed": 252
+                },
+                "target_ivs": {
+                  "hp": 31,
+                  "attack": 0,
+                  "defense": 31,
+                  "special_attack": 31,
+                  "special_defense": 31,
+                  "speed": 31
+                },
+                "notes": "Max special sweeper build - prioritizing Speed and Special Attack"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Training guide created successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Total EVs cannot exceed 510."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "An error occurred while creating the training guide."
+          }
+        }
+      }
+    },
+    "/training_guides/{id}": {
+      "get": {
+        "tags": ["Training Guides"],
+        "description": "Retrieve a specific training guide by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Training guide returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "Training guide not found."
+          },
+          "500": {
+            "description": "An error occurred while fetching the training guide."
+          }
+        }
+      },
+      "put": {
+        "tags": ["Training Guides"],
+        "description": "Update a specific training guide by ID (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Training guide update payload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Training guide updated successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Total EVs cannot exceed 510."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Training guide not found."
+          },
+          "500": {
+            "description": "An error occurred while updating the training guide."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Training Guides"],
+        "description": "Delete a specific training guide by ID (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Training guide deleted successfully."
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Training guide not found."
+          },
+          "500": {
+            "description": "An error occurred while deleting the training guide."
+          }
+        }
+      }
+    },
+    "/training_guides/pokemon/{pokemonId}": {
+      "get": {
+        "tags": ["Training Guides"],
+        "description": "Retrieve training guides relevant to a specific Pokémon.",
+        "parameters": [
+          {
+            "name": "pokemonId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Training guides for the Pokémon returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "404": {
+            "description": "No training guide found for this pokemon."
+          },
+          "500": {
+            "description": "An error occurred while fetching the training guide."
+          }
+        }
+      }
+    },
+    "/training_guides/check-achievability": {
+      "post": {
+        "tags": ["Training Guides"],
+        "description": "Evaluate whether a training plan is achievable given constraints (requires authentication).",
+        "security": [
+          {
+            "GitHubOAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "description": "Plan details to evaluate achievability"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Achievability result returned successfully"
+          },
+          "422": {
+            "description": "Validation failed (Unprocessable Entity)"
+          },
+          "400": {
+            "description": "Total EVs cannot exceed 510."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "An error occurred while checking achievability."
+          }
+        }
       }
     }
   }
