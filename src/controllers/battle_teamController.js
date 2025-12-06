@@ -54,7 +54,7 @@ battle_teamController.createBattleTeam = async (req, res) => {
     const { name_of_team, custom_pokemon_ids } = req.body;
 
     // Map incoming payload to model shape: store custom IDs in the `pokemon` array as `pokemon_id` entries.
-    const pokemonArr = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
+    const pokemonArr = custom_pokemon_ids.map(id => ({ pokemon_id: new mongoose.Types.ObjectId(id) }));
 
     const newTeam = new BattleTeam({
       name_of_team: name_of_team,
@@ -76,7 +76,7 @@ battle_teamController.updateBattleTeamById = async (req, res) => {
 
     const updatedData = { ...otherUpdates };
     if (name_of_team) updatedData.name_of_team = name_of_team;
-    if (custom_pokemon_ids) updatedData.pokemon = custom_pokemon_ids.map(id => ({ pokemon_id: mongoose.Types.ObjectId(id) }));
+    if (custom_pokemon_ids) updatedData.pokemon = custom_pokemon_ids.map(id => ({ pokemon_id: new mongoose.Types.ObjectId(id) }));
 
     const result = await BattleTeam.updateOne({ _id: req.params.id }, { $set: updatedData });
 

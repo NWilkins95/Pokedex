@@ -45,7 +45,11 @@ const pokemonSchema = new mongoose.Schema({
     special_defense: { type: Number, required: true },
     speed: { type: Number, required: true }
   },
-  image_url: String
+  image_url: String,
+  isTestData: {
+    type: Boolean,
+    default: false
+  }
 }, {
   timestamps: true
 });
