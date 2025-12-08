@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node src/seed.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "test": "jest --detectOpenHandles"
   },
   "keywords": [
     "pokemon",
@@ -29,7 +30,10 @@
     "validatorjs": "^3.22.1"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^6.0.2",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
+    "supertest": "^7.1.4",
     "swagger-autogen": "^2.23.7"
   }
 }
