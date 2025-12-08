@@ -130,7 +130,7 @@ const validateBattleHistoryUpdate = (req, res, next) => {
 const validateCustomPokemonCreate = (req, res, next) => {
 	const rules = {
 		base_pokemon_id: 'required|string',
-		nickname: 'optional|string|max:100',
+		nickname: 'string|max:100',
 		level: 'required|integer|min:1|max:100',
 		ability: 'required|string',
 		moves: 'required|array',
