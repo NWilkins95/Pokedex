@@ -90,11 +90,11 @@ customPokemonController.createCustomPokemon = async (req, res) => {
     }
 
     const newCustomPokemon = new CustomPokemon({
-      base_pokemon_id: mongoose.Types.ObjectId(base_pokemon_id),
+      base_pokemon_id: new mongoose.Types.ObjectId(base_pokemon_id),
       nickname,
       level,
       ability,
-      moves: moves.map(id => mongoose.Types.ObjectId(id)),
+      moves: moves.map(id => new mongoose.Types.ObjectId(id)),
       stats
     });
 
@@ -155,7 +155,7 @@ customPokemonController.updateCustomPokemonById = async (req, res) => {
 
     const updatedData = {
       ...otherUpdates,
-      ...(moves && { moves: moves.map(id => mongoose.Types.ObjectId(id)) }),
+      ...(moves && { moves: moves.map(id => new mongoose.Types.ObjectId(id)) }),
       ...(level && { level }),
       ...(stats && { stats })
     };
