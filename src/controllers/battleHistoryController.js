@@ -80,7 +80,7 @@ battleHistoryController.createBattleHistory = async (req, res) => {
     const { battle_team_id, battle_date, result, notes } = req.body;
 
     const newHistory = new BattleHistory({
-      battle_team_id: mongoose.Types.ObjectId(battle_team_id),
+      battle_team_id: new mongoose.Types.ObjectId(battle_team_id),
       battle_date: new Date(battle_date),
       result,
       notes: notes || ''
