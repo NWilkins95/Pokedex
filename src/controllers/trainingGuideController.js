@@ -119,7 +119,7 @@ trainingGuideController.createTrainingGuide = async (req, res) => {
     const achievabilityCheck = await checkAchievability(custom_pokemon_id, target_evs, target_ivs);
 
     const newGuide = new TrainingGuide({
-      custom_pokemon_id: mongoose.Types.ObjectId(custom_pokemon_id),
+      custom_pokemon_id: new mongoose.Types.ObjectId(custom_pokemon_id),
       target_evs,
       target_ivs,
       is_achievable: achievabilityCheck.achievable,
