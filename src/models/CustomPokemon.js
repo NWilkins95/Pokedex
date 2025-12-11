@@ -24,7 +24,7 @@ const customPokemonSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Move',
     validate: {
-      validator: function(moves) {
+      validator: function(moves = []) {
         return moves.length <= 4;
       },
       message: 'A Pokemon can only have up to 4 moves'
