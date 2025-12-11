@@ -20,16 +20,16 @@ const customPokemonSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  moves: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Move',
+  // Replace the moves field with this
+  moves: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Move' }],
     validate: {
-      validator: function(moves = []) {
+      validator: function (moves = []) {
         return moves.length <= 4;
       },
       message: 'A Pokemon can only have up to 4 moves'
     }
-  }],
+  },
   stats: {
     hp: { type: Number, required: true, min: 1 },
     attack: { type: Number, required: true, min: 1 },
