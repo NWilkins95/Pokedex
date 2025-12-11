@@ -20,7 +20,6 @@ const customPokemonSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // Replace the moves field with this
   moves: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Move' }],
     validate: {
